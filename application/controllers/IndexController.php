@@ -10,7 +10,10 @@ class IndexController extends Zend_Controller_Action
 
     public function indexAction()
     {
-        // action body
+        $test = new Model_Parser_Imdb(array(
+        	'id' => '0499549',
+        ));
+        var_dump($test->data());
     }
 
 

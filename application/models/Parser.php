@@ -11,7 +11,7 @@ abstract class Model_Parser
 	{
 		foreach ($this->_requiredOptions as $option) {
 			if (!isset($options[$option])) {
-				throw new Model_Parser_Exception_MissingOption($option);
+				throw new Model_Parser_Exception_MissingOption('Missing required option: '.$option);
 			}
 		}
 		$this->_options = $options;
@@ -19,6 +19,14 @@ abstract class Model_Parser
 	
 	abstract protected function _fetchData();
 	
-	abstract protected function _parseData();
+	abstract protected function _parseData($data);
+	
+	public function data()
+	{
+		if (!isset($this->_data)) {
+			$this->_data = $this->_parseData($this->_fetchData());
+		}
+		return $this->_data;
+	}
 	
 }
