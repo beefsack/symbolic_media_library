@@ -40,6 +40,9 @@ $(document).ready(function() {
 			Cancel: function() {
 				$('#serverFileDialog').dialog('close');
 			},
+			"Create Directory": function() {
+				$('#createDirectoryDialog').dialog('open');
+			},
 			Select: function() {
 				submitServerFileDialog();
 			}
@@ -51,5 +54,40 @@ $(document).ready(function() {
 		title: "Select a directory",
 		show: "drop",
 		hide: "drop"
+	});
+	$('#createDirectoryDialog').dialog({
+		autoOpen: false,
+		buttons: {
+			Cancel: function() {
+				$('#createDirectoryDialog').dialog('close');
+			},
+			Create: function() {
+				$.getJSON(PUBLIC_PATH+'/ajax/createdirectory', {
+					path: $('#serverFileDialog #path').html(),
+					name: $('#createDirectoryName').val()
+				}, function(data) {
+					if (data.result) {
+						$('#createDirectoryDialog').dialog('close');
+						serverFileDialogChange($('#serverFileDialog #path').html());
+					} else {
+						var error = "Unspecified error creating directory";
+						if (data.error) {
+							error = data.error;
+						}
+						$('#createDirectoryDialogError').html(error);
+						$('#createDirectoryDialogError').fadeIn();
+					}
+				});
+			}
+		},
+		modal: true,
+		resizable: false,
+		title: "Create directory",
+		show: "drop",
+		hide: "drop",
+		open: function(event, ui) {
+			$('#createDirectoryName').val('');
+			$('#createDirectoryDialogError').hide();
+		}
 	});
 });
