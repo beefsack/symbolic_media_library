@@ -13,8 +13,6 @@ class IndexController extends Zend_Controller_Action
         $test = new Model_Parser_Imdb(array(
         	'id' => '0240772',
         ));
-        echo "<pre>";
-        var_dump($test->data());
     }
 
 

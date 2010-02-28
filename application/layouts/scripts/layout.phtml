@@ -1,0 +1,16 @@
+<html>
+	<head>
+<?= $this->jQuery()->uiEnable() ?>
+<?= $this->headLink()
+	->appendStylesheet(PUBLIC_PATH.'/css/ui-darkness/jquery-ui-1.8rc2.custom.css')
+	->appendStylesheet(PUBLIC_PATH.'/css/style.css')
+	?>
+<?= $this->headScript()
+	->appendScript('PUBLIC_PATH = "'.PUBLIC_PATH.'";')
+	->appendFile(PUBLIC_PATH.'/js/script.js')
+?>
+	</head>
+	<body>
+<?= $this->layout()->content ?>
+	</body>
+</html>
