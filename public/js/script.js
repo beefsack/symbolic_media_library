@@ -14,9 +14,9 @@ function serverFileDialogChange(path)
 	if (path != undefined) {
 		params.path = path;
 	}
-	$('#serverFileDialog #files').children().remove();
 	$.getJSON(PUBLIC_PATH+'/ajax/fetchdirectory', params, function(data) {
 		$('#serverFileDialog #path').html(data.path);
+		$('#serverFileDialog #files').children().remove();
 		$.each(data.files, function(index, value) {
 			if (value.directory) {
 				$('#serverFileDialog #files').append('<div class="file"><span class="link" onclick="serverFileDialogChange(\''+data.path+'/'+value.file+'\')">'+value.file+'</span></div>');
@@ -31,6 +31,25 @@ function submitServerFileDialog()
 {
 	$($('#serverFileDialogTarget').val()).val($('#serverFileDialog #path').html());
 	$('#serverFileDialog').dialog('close');
+}
+
+function generateLibrary()
+{
+	var params = {};
+	params.type = 'Model_LibraryType_Video';
+	params.source = $('#source').val();
+	params.destination = $('#destination').val();
+	$.getJSON(PUBLIC_PATH+'/ajax/generatelibrary', params, function(data) {
+		if (data.result) {
+			alert('success!');
+		} else {
+			var error = 'Unspecified error while generating library';
+			if (data.error) {
+				error = data.error;
+			}
+			alert(error);
+		}
+	});
 }
 
 $(document).ready(function() {

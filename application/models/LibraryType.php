@@ -8,4 +8,9 @@ abstract class Model_LibraryType
 	{
 		return $this->_name;
 	}
+	
+	public function generateLibrary($source, $destination)
+	{
+		throw new Exception('Not implemented yet');
+	}
 }

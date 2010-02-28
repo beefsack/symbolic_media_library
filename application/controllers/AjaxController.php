@@ -67,6 +67,32 @@ class AjaxController extends Zend_Controller_Action
    			'result' => true,
 		));
 	}
+	
+	public function generatelibraryAction()
+	{
+		ob_start();
+		try {
+			$type = $this->_getParam('type');
+			if (!class_exists($type)) {
+				throw new Exception('Class '.$type.' can not be found');
+			}
+			$library = new $type;
+			if (!($library instanceof Model_LibraryType)) {
+				throw new Exception($type.' is not an instance of Model_LibraryType');
+			}
+			$library->generateLibrary($this->_getParam('source'), $this->_getParam('destination'));
+		} catch (Exception $e) {
+			ob_end_clean();
+			echo Zend_Json::encode(array(
+				'error' => $e->getMessage(),
+			));
+			return;
+		}
+		ob_end_clean();
+		echo Zend_Json::encode(array(
+			'result' => true,
+		));
+	}
 
 }
 
