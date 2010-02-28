@@ -44,7 +44,6 @@ $(document).ready(function() {
 				submitServerFileDialog();
 			}
 		},
-		draggable: false,
 		width: 600,
 		height: 400,
 		modal: true,

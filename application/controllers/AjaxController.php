@@ -12,6 +12,9 @@ class AjaxController extends Zend_Controller_Action
     public function fetchdirectoryAction()
     {
     	$path = str_replace('\\', '/', realpath($this->_getParam('path', dirname(__FILE__))));
+    	if (!$path) {
+    		$path = '/';
+    	}
     	$directory = array(
     		'path' => $path,
     	);
