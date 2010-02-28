@@ -1,1 +1,12 @@
-<input id='eggbacon' disabled="disabled" /><input type="button" onclick="serverFileDialog('#eggbacon', $('#eggbacon').val())" value="Choose Directory" />
+<div class="option">
+	<input class="path" id="destination" disabled="disabled" />
+	<a href="#" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="serverFileDialog('#destination', $('#destination').val())">
+		<span class="ui-button-text">Choose Destination Directory</span>
+	</a>
+</div>
+<div class="option">
+	<input class="path" id="source" disabled="disabled" />
+	<a href="#" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="serverFileDialog('#source', $('#source').val())">
+		<span class="ui-button-text">Choose Source Directory</span>
+	</a>
+</div>
