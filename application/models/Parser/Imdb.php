@@ -11,7 +11,6 @@ class Model_Parser_Imdb extends Model_Parser
 	protected function _fetchData()
 	{
 		$movie = new imdb($this->_options['id']);
-		var_dump($movie->title());
 		return $movie;
 	}
 	
