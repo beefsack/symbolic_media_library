@@ -1,11 +1,11 @@
-function serverFileDialog(target)
+function serverFileDialog(target, path)
 {
 	if (target == undefined || $(target).size() == 0) {
 		throw "Unable to find target";
 	}
-	$('#submitServerFileDialog').attr('target', target);
+	$('#serverFileDialogTarget').val(target);
 	$('#serverFileDialog').dialog('open');
-	serverFileDialogChange();
+	serverFileDialogChange(path);
 }
 
 function serverFileDialogChange(path)
@@ -27,18 +27,30 @@ function serverFileDialogChange(path)
 	});	
 }
 
-function submitServerFileDialog(target)
+function submitServerFileDialog()
 {
-	$(target).val($('#serverFileDialog #path').html());
+	$($('#serverFileDialogTarget').val()).val($('#serverFileDialog #path').html());
 	$('#serverFileDialog').dialog('close');
 }
 
 $(document).ready(function() {
 	$('#serverFileDialog').dialog({
 		autoOpen: false,
+		buttons: {
+			Cancel: function() {
+				$('#serverFileDialog').dialog('close');
+			},
+			Select: function() {
+				submitServerFileDialog();
+			}
+		},
+		draggable: false,
+		width: 600,
+		height: 400,
 		modal: true,
+		resizable: false,
 		title: "Select a directory",
-		show: "slide",
-		hide: "slide"
+		show: "drop",
+		hide: "drop"
 	});
 });

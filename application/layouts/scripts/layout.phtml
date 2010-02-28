@@ -14,8 +14,8 @@
 	<body>
 <?= $this->layout()->content ?>
 		<div id="serverFileDialog">
+			<input type="hidden" id="serverFileDialogTarget" />
 			<div id="path">Loading...</div>
-			<div id="actions"><span id="submitServerFileDialog" class="link" target="" onclick="submitServerFileDialog($(this).attr('target'))">Select</span><span class="link" onclick="$('#serverFileDialog').dialog('close');">Cancel</span></div>
 			<div id="files"></div>
 		</div>
 	</body>
