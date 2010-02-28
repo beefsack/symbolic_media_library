@@ -1,16 +1,2 @@
-<script type="text/javascript">
-$(document).ready(function() {
-	$('#serverFileDialog').dialog({
-		autoOpen: false,
-		modal: true,
-		title: "Select a directory",
-		show: "slide",
-		hide: "slide"
-	});
-});
-</script>
-<span class="link" onclick="serverFileDialog()">Clicky</span>
-<div id="serverFileDialog">
-	<div id="path">Loading...</div>
-	<div id="files"></div>
-</div>
+<span class="link" onclick="serverFileDialog('#eggbacon')">Clicky</span>
+<input id='eggbacon' />

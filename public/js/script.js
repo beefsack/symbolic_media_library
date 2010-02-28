@@ -1,5 +1,9 @@
-function serverFileDialog()
+function serverFileDialog(target)
 {
+	if (target == undefined || $(target).size() == 0) {
+		throw "Unable to find target";
+	}
+	$('#submitServerFileDialog').attr('target', target);
 	$('#serverFileDialog').dialog('open');
 	serverFileDialogChange();
 }
@@ -22,3 +26,19 @@ function serverFileDialogChange(path)
 		});
 	});	
 }
+
+function submitServerFileDialog(target)
+{
+	$(target).val($('#serverFileDialog #path').html());
+	$('#serverFileDialog').dialog('close');
+}
+
+$(document).ready(function() {
+	$('#serverFileDialog').dialog({
+		autoOpen: false,
+		modal: true,
+		title: "Select a directory",
+		show: "slide",
+		hide: "slide"
+	});
+});
