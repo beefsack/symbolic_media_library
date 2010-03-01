@@ -24,7 +24,7 @@ abstract class Model_LibraryType
 		}
 		
 		// Initialise database
-		if (($this->_databasePath = realpath($this->_destination.'/'.self::DATABASE_NAME))) {
+		if (($this->_databasePath = realpath($this->_destination).'/'.self::DATABASE_NAME)) {
 			if (($this->_database = simplexml_load_file($this->_databasePath)) === false) {
 				$this->_database = new SimpleXMLElement('<library></library>');
 			}
@@ -35,9 +35,16 @@ abstract class Model_LibraryType
 		// Populate database
 		$this->_parseSource($this->_source);
 		
-		throw new Exception($this->_database->asXML());
-		
-		throw new Exception('Not implemented yet');
+		if (($handle = fopen($this->_databasePath, 'w')) === false) {
+			throw new Exception('Unable to open database file at '.$this->_databasePath);
+		}
+		if (fwrite($handle, $this->_database->asXML()) === false) {
+			fclose($handle);
+			throw new Exception('Unable to write to database file at '.$this->_databasePath);		
+		}
+		fclose($handle);
+
+		throw new Exception('done');
 	}
 	
 	/**
@@ -87,6 +94,7 @@ abstract class Model_LibraryType
 		if (is_dir($source) && !is_link($source) && ($dir = opendir($source)) !== false) {
 			$pathinfo = pathinfo($source);
 			if (!$this->_database->xpath('//item[@id="'.str_replace('"', '&quot;', $pathinfo['basename']).'"]') && $data = $this->_getData($pathinfo['basename'])) {
+				$data['path'] = $source;
 				$item = $this->_database->addChild('item');
 				$item->addAttribute('id', $pathinfo['basename']);
 				$this->_setData($item, $data);
