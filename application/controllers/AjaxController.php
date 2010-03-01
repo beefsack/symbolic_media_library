@@ -30,6 +30,7 @@ class AjaxController extends Zend_Controller_Action
 				$fileslower[] = strtolower($file);
 				$directories[] = (int) is_dir($path.'/'.$file);
 			}
+			closedir($dir);
 		}
 		// Put directories up top, then sort by filename case insensitive
 		array_multisort($directories, SORT_NUMERIC, SORT_DESC, $fileslower, SORT_STRING, $files);
@@ -80,7 +81,9 @@ class AjaxController extends Zend_Controller_Action
 			if (!($library instanceof Model_LibraryType)) {
 				throw new Exception($type.' is not an instance of Model_LibraryType');
 			}
-			$library->generateLibrary($this->_getParam('source'), $this->_getParam('destination'));
+			$library->setSource($this->_getParam('source'))
+				->setDestination($this->_getParam('destination'))
+				->generateLibrary();
 		} catch (Exception $e) {
 			ob_end_clean();
 			echo Zend_Json::encode(array(

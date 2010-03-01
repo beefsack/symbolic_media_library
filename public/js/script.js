@@ -19,7 +19,7 @@ function serverFileDialogChange(path)
 		$('#serverFileDialog #files').children().remove();
 		$.each(data.files, function(index, value) {
 			if (value.directory) {
-				$('#serverFileDialog #files').append('<div class="file"><span class="link" onclick="serverFileDialogChange(\''+data.path+'/'+value.file+'\')">'+value.file+'</span></div>');
+				$('#serverFileDialog #files').append('<div class="file"><span class="link" onclick="serverFileDialogChange(\''+escapeQuotes(data.path)+'/'+escapeQuotes(value.file)+'\')">'+value.file+'</span></div>');
 			} else {
 				$('#serverFileDialog #files').append('<div class="file">'+value.file+'</div>');
 			}
@@ -50,6 +50,11 @@ function generateLibrary()
 			alert(error);
 		}
 	});
+}
+
+function escapeQuotes(str)
+{
+	return str.replace('\'', '\\&apos;').replace('"', '\\&quot;');
 }
 
 $(document).ready(function() {
