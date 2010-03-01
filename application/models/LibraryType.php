@@ -8,6 +8,8 @@ abstract class Model_LibraryType
 	protected $_databasePath;
 	protected $_source;
 	protected $_destination;
+	protected $_structure;
+	protected $_pluginFolder;
 	
 	const DATABASE_NAME = 'sml.xml';
 	
@@ -23,6 +25,8 @@ abstract class Model_LibraryType
 			throw new Exception('Source or destination not yet set');
 		}
 		
+		// Check plugin base is set
+		
 		// Initialise database
 		if (($this->_databasePath = realpath($this->_destination).'/'.self::DATABASE_NAME)) {
 			if (($this->_database = simplexml_load_file($this->_databasePath)) === false) {
@@ -35,6 +39,7 @@ abstract class Model_LibraryType
 		// Populate database
 		$this->_parseSource($this->_source);
 		
+		// Save database
 		if (($handle = fopen($this->_databasePath, 'w')) === false) {
 			throw new Exception('Unable to open database file at '.$this->_databasePath);
 		}
@@ -43,8 +48,67 @@ abstract class Model_LibraryType
 			throw new Exception('Unable to write to database file at '.$this->_databasePath);		
 		}
 		fclose($handle);
-
-		throw new Exception('done');
+		
+		// Build structure from database
+		$this->_buildStructure();
+		
+		// Create links from structure
+		$this->_createLinks($this->_destination, $this->_structure);
+	}
+	
+	protected function _createLinks($directory, array $structure)
+	{
+		if (($directory = realpath($directory)) === false) {
+			throw new Exception('Could not find directory');
+		}
+		if (!is_dir($directory)) {
+			throw new Exception($directory.' is not a directory for generating links');
+		}
+		foreach ($structure as $key => &$value) {
+			if (is_array($value)) {
+				// Create dir if needed and keep recursing
+				if (file_exists($directory.'/'.$key)) {
+					if (!is_dir($directory.'/'.$key)) {
+						continue;
+					}
+				} else {
+					mkdir($directory.'/'.$key);
+				}
+				$this->_createLinks($directory.'/'.$key, $value);
+			} else {
+				// Create symlink
+				if (file_exists($value)) {
+					if (file_exists($directory.'/'.$key)) {
+						if (is_link($directory.'/'.$key)) {
+							unlink($directory.'/'.$key);
+						} else {
+							continue;
+						}
+					}
+					if (!symlink($value, $directory.'/'.$key)) {
+						throw new Exception('Unable to make symlink at '.$directory.'/'.$key.' to '.$value);
+					}
+				}
+			}
+		}
+	}
+	
+	protected function _buildStructure()
+	{
+		if (!$this->_pluginFolder) {
+			throw new Exception('Plugin folder not set');
+		}
+		// Fetch and run plugins
+		$classes = Model_ClassList::getClasses($_pluginFolder);
+		$this->_structure = array();
+		foreach ($classes as $class) {
+			if (class_exists($class)) {
+				$plugin = new $class;
+				if ($plugin instanceof Model_LibraryPlugin) {
+					$this->_structure = array_merge_recursive($plugin->getStructure($this->_database), $this->_structure);
+				}
+			}
+		}
 	}
 	
 	/**
