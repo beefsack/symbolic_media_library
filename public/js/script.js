@@ -39,7 +39,12 @@ function generateLibrary()
 	params.type = 'Model_LibraryType_Video';
 	params.source = $('#source').val();
 	params.destination = $('#destination').val();
+	$('#generateStatusDialog').dialog('open');
+	var reload = setInterval(function() {
+		loadLog(params.destination);
+	}, 2000);
 	$.getJSON(PUBLIC_PATH+'/ajax/generatelibrary', params, function(data) {
+		clearInterval(reload);
 		if (data.result) {
 			alert('success!');
 		} else {
@@ -47,7 +52,17 @@ function generateLibrary()
 			if (data.error) {
 				error = data.error;
 			}
+			$('#generateStatusDialog').dialog('close');
 			alert(error);
+		}
+	});
+}
+
+function loadLog(path)
+{
+	$.getJSON(PUBLIC_PATH+'/ajax/loadlog', {path: path}, function(data) {
+		if (data.result) {
+			$('#generateStatusDialogConsole').html(data.data);
 		}
 	});
 }
@@ -113,5 +128,26 @@ $(document).ready(function() {
 			$('#createDirectoryName').val('');
 			$('#createDirectoryDialogError').hide();
 		}
+	});
+	$('#generateStatusDialog').dialog({
+		autoOpen: false,
+//		buttons: {
+//			Cancel: function() {
+//				$('#serverFileDialog').dialog('close');
+//			},
+//			"Create Directory": function() {
+//				$('#createDirectoryDialog').dialog('open');
+//			},
+//			Select: function() {
+//				submitServerFileDialog();
+//			}
+//		},
+		closeOnEscape: false,
+		modal: true,
+		resizable: false,
+		title: "Generate library",
+		width: 640,
+		show: "drop",
+		hide: "drop"
 	});
 });

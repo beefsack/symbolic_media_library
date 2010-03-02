@@ -8,6 +8,23 @@ class AjaxController extends Zend_Controller_Action
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender(true);
 	}
+	
+	public function loadlogAction()
+	{
+		if (($path = realpath($this->_getParam('path'))) === false) {
+			throw new Exception('Unable to find path '.$this->_getParam('path'));
+		}
+		if (($logPath = realpath($path.'/'.Model_LibraryType::LOG_NAME)) === false) {
+			throw new Exception('Unable to find log file '.$path.'/'.Model_LibraryType::LOG_NAME);
+		}
+		if (($log = file_get_contents($logPath)) === false) {
+			throw new Exception('Unable to read log file '.$logPath);
+		}
+		echo Zend_Json::encode(array(
+			'result' => true,
+			'data' => $log,
+		));
+	}
 
 	public function fetchdirectoryAction()
 	{
