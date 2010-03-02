@@ -49,6 +49,10 @@ abstract class Model_LibraryType
 			$this->_database = new SimpleXMLElement('<library></library>');
 		}
 		
+		// Validate database
+		$this->_logger->info('Validating database links.');
+		$this->_validateDatabase();
+		
 		// Populate database
 		$this->_logger->info('Populating database.');
 		$this->_parseSource($this->_source);
@@ -223,6 +227,21 @@ abstract class Model_LibraryType
 					$element->addChild($key, $value);
 				}
 			}
+		}
+	}
+	
+	protected function _validateDatabase()
+	{
+		$remove = array();
+		foreach ($this->_database as $item) {
+			if (!realpath((string) $item->path)) {
+				$remove[] = $item;
+			}
+		}
+		foreach ($remove as $item) {
+			$this->_logger->info('Path '.$item->path.' for item '.$item['id'].' not found, removing from database.');
+			$dom = dom_import_simplexml($item);
+			$dom->parentNode->removeChild($dom);
 		}
 	}
 	
