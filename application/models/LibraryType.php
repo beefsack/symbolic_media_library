@@ -10,8 +10,11 @@ abstract class Model_LibraryType
 	protected $_destination;
 	protected $_structure;
 	protected $_pluginBase;
+	protected $_logger;
+	protected $_logPath;
 	
 	const DATABASE_NAME = 'sml.xml';
+	const LOG_NAME = 'sml.log';
 	
 	public function getName()
 	{
@@ -27,21 +30,31 @@ abstract class Model_LibraryType
 			throw new Exception('Source or destination not yet set');
 		}
 		
-		// Check plugin base is set
+		// Initialise logger
+		$this->_logPath = realpath($this->_destination).'/'.self::LOG_NAME;
+		$writer = new Zend_Log_Writer_Stream($this->_logPath, 'w');
+		$this->_logger = new Zend_Log($writer);
+		$this->_logger->info('Log initialised, commencing library generation.');
 		
 		// Initialise database
+		$this->_logger->info('Initialising database.');
 		if (($this->_databasePath = realpath($this->_destination).'/'.self::DATABASE_NAME)) {
+			$this->_logger->info('Found a database at '.$this->_databasePath.', loading.');
 			if (($this->_database = simplexml_load_file($this->_databasePath)) === false) {
+				$this->_logger->info('Unable to load database, creating a new one.');
 				$this->_database = new SimpleXMLElement('<library></library>');
 			}
 		} else {
+			$this->_logger->info('Creating a new database.');
 			$this->_database = new SimpleXMLElement('<library></library>');
 		}
 		
 		// Populate database
+		$this->_logger->info('Populating database.');
 		$this->_parseSource($this->_source);
 		
 		// Save database
+		$this->_logger->info('Saving database to '.$this->_databasePath.'.');
 		if (($handle = fopen($this->_databasePath, 'w')) === false) {
 			throw new Exception('Unable to open database file at '.$this->_databasePath);
 		}
@@ -52,10 +65,14 @@ abstract class Model_LibraryType
 		fclose($handle);
 		
 		// Build structure from database
+		$this->_logger->info('Building directory structure from database.');
 		$this->_buildStructure();
 		
 		// Create links from structure
+		$this->_logger->info('Creating symbolic links from structure.');
 		$this->_createLinks($this->_destination, $this->_structure);
+		
+		$this->_logger->info('Library generation successful.');
 	}
 	
 	protected function _createLinks($directory, array $structure)
@@ -79,6 +96,7 @@ abstract class Model_LibraryType
 				$this->_createLinks($directory.'/'.$key, $value);
 			} else {
 				// Create symlink
+				$this->_logger->info('Creating symlink at '.$directory.'/'.$key.' to '.$value.'.');
 				if (file_exists($value)) {
 					if (file_exists($directory.'/'.$key)) {
 						if (is_link($directory.'/'.$key)) {
@@ -104,6 +122,7 @@ abstract class Model_LibraryType
 		$classes = Model_ClassList::getClasses(array('parent' => $this->_pluginBase));
 		$this->_structure = array();
 		foreach ($classes as $class) {
+			$this->_logger->info('Running plugin '.$class.'.');
 			$plugin = new $class;
 			$this->_structure = array_merge_recursive($plugin->getStructure($this->_database), $this->_structure);
 		}
@@ -153,9 +172,11 @@ abstract class Model_LibraryType
 	 */
 	protected function _parseSource($source)
 	{
+		$this->_logger->info('Parsing '.$source.'.');
 		if (is_dir($source) && !is_link($source) && ($dir = opendir($source)) !== false) {
 			$pathinfo = pathinfo($source);
 			if (!$this->_database->xpath('//item[@id="'.str_replace('"', '&quot;', $pathinfo['basename']).'"]') && $data = $this->_getData($pathinfo['basename'])) {
+				$this->_logger->info('Fetched data for '.$pathinfo['basename'].'.');
 				$data['path'] = $source;
 				$item = $this->_database->addChild('item');
 				$item->addAttribute('id', $pathinfo['basename']);
