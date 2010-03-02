@@ -2,7 +2,7 @@
 
 class Model_LibraryPlugin_Video_ReviewScores extends Model_LibraryPlugin_Video
 {
-	const MIN_VOTES = 500;
+	const MIN_VOTES = 200;
 	
 	public function getStructure(SimpleXMLElement $data)
 	{
