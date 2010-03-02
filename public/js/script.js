@@ -45,6 +45,7 @@ function generateLibrary()
 	}, 2000);
 	$.getJSON(PUBLIC_PATH+'/ajax/generatelibrary', params, function(data) {
 		clearInterval(reload);
+		loadLog(params.destination);
 		if (data.result) {
 			alert('success!');
 		} else {
@@ -62,7 +63,9 @@ function loadLog(path)
 {
 	$.getJSON(PUBLIC_PATH+'/ajax/loadlog', {path: path}, function(data) {
 		if (data.result) {
-			$('#generateStatusDialogConsole').html(data.data);
+			var element = $('#generateStatusDialogConsole');
+			element.html(data.data);
+			element.scrollTop(element[0].scrollHeight);
 		}
 	});
 }
