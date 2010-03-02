@@ -9,7 +9,7 @@ abstract class Model_LibraryType
 	protected $_source;
 	protected $_destination;
 	protected $_structure;
-	protected $_pluginFolder;
+	protected $_pluginBase;
 	
 	const DATABASE_NAME = 'sml.xml';
 	
@@ -97,19 +97,15 @@ abstract class Model_LibraryType
 	
 	protected function _buildStructure()
 	{
-		if (!$this->_pluginFolder) {
-			throw new Exception('Plugin folder not set');
+		if (!class_exists($this->_pluginBase)) {
+			throw new Exception('Plugin base class does not exist');
 		}
 		// Fetch and run plugins
-		$classes = Model_ClassList::getClasses($_pluginFolder);
+		$classes = Model_ClassList::getClasses(array('parent' => $this->_pluginBase));
 		$this->_structure = array();
 		foreach ($classes as $class) {
-			if (class_exists($class)) {
-				$plugin = new $class;
-				if ($plugin instanceof Model_LibraryPlugin) {
-					$this->_structure = array_merge_recursive($plugin->getStructure($this->_database), $this->_structure);
-				}
-			}
+			$plugin = new $class;
+			$this->_structure = array_merge_recursive($plugin->getStructure($this->_database), $this->_structure);
 		}
 	}
 	

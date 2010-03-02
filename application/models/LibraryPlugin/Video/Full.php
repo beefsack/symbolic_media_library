@@ -1,6 +1,6 @@
 <?php
 
-class Model_LibraryPlugin_Video_Full extends Model_LibraryPlugin
+class Model_LibraryPlugin_Video_Full extends Model_LibraryPlugin_Video
 {
 	public function getStructure(SimpleXMLElement $data)
 	{
