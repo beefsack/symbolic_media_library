@@ -10,9 +10,8 @@ class IndexController extends Zend_Controller_Action
 
     public function indexAction()
     {
-        $test = new Model_Parser_Imdb(array(
-        	'id' => '0240772',
-        ));
+    	$this->view->source = $this->_getParam('source');
+    	$this->view->destination = $this->_getParam('destination');
     }
 
 
