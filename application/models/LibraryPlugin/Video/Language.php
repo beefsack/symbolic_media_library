@@ -6,7 +6,7 @@ class Model_LibraryPlugin_Video_Language extends Model_LibraryPlugin_Video
 	{
 		$structure = array();
 		foreach ($data->item as $item) {
-			$structure['By Language'][(string) $item->language][$item->title.' ('.$item->year.')'] = (string) $item->path;
+			$structure['By Language'][(string) $item->language][$this->buildTitle($item)] = (string) $item->path;
 		}
 		return $structure;
 	}

@@ -7,7 +7,7 @@ class Model_LibraryPlugin_Video_Director extends Model_LibraryPlugin_Video
 		$structure = array();
 		foreach ($data->item as $item) {
 			foreach ($item->director as $director) {
-				$structure['By Director'][(string)$director->name][$item->title.' ('.$item->year.')'] = (string) $item->path;
+				$structure['By Director'][(string)$director->name][$this->buildTitle($item)] = (string) $item->path;
 			}
 		}
 		return $structure;

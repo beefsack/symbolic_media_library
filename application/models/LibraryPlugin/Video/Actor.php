@@ -21,7 +21,7 @@ class Model_LibraryPlugin_Video_Actor extends Model_LibraryPlugin_Video
 		foreach ($data->item as $item) {
 			foreach ($item->cast as $cast) {
 				if (in_array((string) $cast->name, array_keys($actors))) {
-					$structure['By Actor'][(string)$cast->name][$item->title.' ('.$item->year.')'] = (string) $item->path;
+					$structure['By Actor'][(string)$cast->name][$this->buildTitle($item)] = (string) $item->path;
 				}
 			}
 		}

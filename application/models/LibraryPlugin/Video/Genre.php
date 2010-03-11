@@ -7,7 +7,7 @@ class Model_LibraryPlugin_Video_Genre extends Model_LibraryPlugin_Video
 		$structure = array();
 		foreach ($data->item as $item) {
 			foreach ($item->genres as $genre) {
-				$structure['By Genre'][(string) $genre][$item->title.' ('.$item->year.')'] = (string) $item->path;
+				$structure['By Genre'][(string) $genre][$this->buildTitle($item)] = (string) $item->path;
 			}
 		}
 		return $structure;
