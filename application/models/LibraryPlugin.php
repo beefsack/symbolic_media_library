@@ -11,7 +11,13 @@ abstract class Model_LibraryPlugin
 		), $options);
 		$structure = array();
 		foreach ($data as $key => &$item) {
-			$structure[$key[0]][$key] = $item;
+			if (preg_match('/^[a-zA-Z]/', $key)) {
+				$structure[$key[0]][$key] = $item;
+			} elseif (preg_match('/^\d/', $key)) {
+				$structure['0-9'][$key] = $item;
+			} else {
+				$structure['Other'][$key] = $item;
+			}
 			if ($options['createAll']) {
 				$structure['_All'][$key] = $item;
 			}

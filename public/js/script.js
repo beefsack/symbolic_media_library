@@ -53,7 +53,6 @@ function generateLibrary()
 			if (data.error) {
 				error = data.error;
 			}
-			$('#generateStatusDialog').dialog('close');
 			alert(error);
 		}
 	});
