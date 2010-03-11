@@ -5,9 +5,13 @@ class Model_LibraryPlugin_Video_Language extends Model_LibraryPlugin_Video
 	public function getStructure(SimpleXMLElement $data)
 	{
 		$structure = array();
+		$languages = array();
 		foreach ($data->item as $item) {
-			$structure['By Language'][(string) $item->language][$this->buildTitle($item)] = (string) $item->path;
+			$languages[(string) $item->language][$this->_buildTitle($item)] = (string) $item->path;
 		}
-		return $structure;
+		foreach ($languages as $language => $item) {
+			$structure[$language] = $this->_structureByLetter($item);
+		}
+		return array('By Language' => $languages);
 	}
 }

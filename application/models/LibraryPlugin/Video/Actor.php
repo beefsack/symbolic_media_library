@@ -7,6 +7,8 @@ class Model_LibraryPlugin_Video_Actor extends Model_LibraryPlugin_Video
 	public function getStructure(SimpleXMLElement $data)
 	{
 		$structure = array();
+		$actorData = array();
+		$prolific = array();
 		// Count appearances in library for actors
 		$actors = array();
 		foreach ($data->item as $item) {
@@ -20,11 +22,14 @@ class Model_LibraryPlugin_Video_Actor extends Model_LibraryPlugin_Video
 		// create structure
 		foreach ($data->item as $item) {
 			foreach ($item->cast as $cast) {
+				$actorData[(string) $cast->name][$this->_buildTitle($item)] = (string) $item->path;
 				if (in_array((string) $cast->name, array_keys($actors))) {
-					$structure['By Actor'][(string)$cast->name][$this->buildTitle($item)] = (string) $item->path;
+					$prolific[(string) $cast->name][$this->_buildTitle($item)] = (string) $item->path;
 				}
 			}
 		}
+		$structure['By Actor'] = $this->_structureByLetter($actorData);
+		$structure['By Actor']['_Prolific'] = $this->_structureByLetter($prolific);
 		return $structure;
 	}
 }

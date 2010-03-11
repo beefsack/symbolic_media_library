@@ -6,8 +6,8 @@ class Model_LibraryPlugin_Video_Full extends Model_LibraryPlugin_Video
 	{
 		$structure = array();
 		foreach ($data->item as $item) {
-			$structure['By Title'][$this->buildTitle($item)] = (string) $item->path;
+			$structure[$this->_buildTitle($item)] = (string) $item->path;
 		}
-		return $structure;
+		return array('By Title' => $this->_structureByLetter($structure));
 	}
 }

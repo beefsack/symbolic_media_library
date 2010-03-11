@@ -3,7 +3,7 @@
 abstract class Model_LibraryPlugin_Video extends Model_LibraryPlugin
 {
 	
-	protected function parseTitle($title)
+	protected function _parseTitle($title)
 	{
 		// Move the/a to the end of the title
 		if (preg_match('/^(the|a)\s+(.*)/i', $title, $matches)) {
@@ -12,9 +12,9 @@ abstract class Model_LibraryPlugin_Video extends Model_LibraryPlugin
 		return $title;
 	}
 	
-	protected function buildTitle(SimpleXMLElement $data)
+	protected function _buildTitle(SimpleXMLElement $data)
 	{
-		return $this->parseTitle($data->title).' ('.$data->year.')';
+		return $this->_parseTitle($data->title).' ('.$data->year.')';
 	}
 	
 	
