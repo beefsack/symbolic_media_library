@@ -12,8 +12,8 @@ abstract class Model_LibraryPlugin
 		$structure = array();
 		foreach ($data as $key => &$item) {
 			if (preg_match('/^[a-zA-Z]/', $key)) {
-				$structure[$key[0]][$key] = $item;
-			} elseif (preg_match('/^\d/', $key)) {
+				$structure[strtoupper($key[0])][$key] = $item;
+			} elseif (preg_match('/^[0-9]/', $key)) {
 				$structure['0-9'][$key] = $item;
 			} else {
 				$structure['Other'][$key] = $item;
