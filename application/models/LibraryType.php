@@ -88,29 +88,30 @@ abstract class Model_LibraryType
 			throw new Exception($directory.' is not a directory for generating links');
 		}
 		foreach ($structure as $key => &$value) {
+			$cleanKey = str_replace('/', '-', $key);
 			if (is_array($value)) {
 				// Create dir if needed and keep recursing
-				if (file_exists($directory.'/'.$key)) {
-					if (!is_dir($directory.'/'.$key)) {
+				if (file_exists($directory.'/'.$cleanKey)) {
+					if (!is_dir($directory.'/'.$cleanKey)) {
 						continue;
 					}
 				} else {
-					mkdir($directory.'/'.$key);
+					mkdir($directory.'/'.$cleanKey);
 				}
-				$this->_createLinks($directory.'/'.$key, $value);
+				$this->_createLinks($directory.'/'.$cleanKey, $value);
 			} else {
 				// Create symlink
-				$this->_logger->info('Creating symlink at '.$directory.'/'.$key.' to '.$value.'.');
+				$this->_logger->info('Creating symlink at '.$directory.'/'.$cleanKey.' to '.$value.'.');
 				if (file_exists($value)) {
-					if (file_exists($directory.'/'.$key)) {
-						if (is_link($directory.'/'.$key)) {
-							unlink($directory.'/'.$key);
+					if (file_exists($directory.'/'.$cleanKey)) {
+						if (is_link($directory.'/'.$cleanKey)) {
+							unlink($directory.'/'.$cleanKey);
 						} else {
 							continue;
 						}
 					}
-					if (!symlink($value, $directory.'/'.$key)) {
-						throw new Exception('Unable to make symlink at '.$directory.'/'.$key.' to '.$value);
+					if (!symlink($value, $directory.'/'.$cleanKey)) {
+						throw new Exception('Unable to make symlink at '.$directory.'/'.$cleanKey.' to '.$value);
 					}
 				}
 			}
