@@ -88,7 +88,6 @@ class AjaxController extends Zend_Controller_Action
 	
 	public function generatelibraryAction()
 	{
-		echo "<pre>";
 		ob_start();
 		try {
 			$type = $this->_getParam('type');

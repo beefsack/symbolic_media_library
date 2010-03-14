@@ -74,8 +74,7 @@ abstract class Model_LibraryType
 		
 		// Create links from structure
 		$this->_logger->info('Creating symbolic links from structure.');
-//		$this->_createLinks($this->_destination, $this->_structure);
-		var_dump($this->_structure);exit;
+		$this->_createLinks($this->_destination, $this->_structure);
 		
 		$this->_logger->info('Library generation successful.');
 	}
