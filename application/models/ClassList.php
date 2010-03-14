@@ -36,7 +36,7 @@ class Model_ClassList
 				}
 			} else {
 				if (preg_match('/^'.preg_quote(realpath(dirname(__FILE__)), '/').'[\/\\\\]?(.*)\.php$/', $path.'/'.$file, $matches)) {
-					$className = 'Model_'.preg_replace('/\//', '_', $matches[1]);
+					$className = 'Model_'.preg_replace('/[\/\\\\]/', '_', $matches[1]);
 					if (!class_exists($className)) {
 						continue;
 					}
