@@ -43,15 +43,14 @@ class Model_LibraryPlugin_Anime_Family extends Model_LibraryPlugin_Anime
 		}
 		// Discover family names and build folders based on that
 		foreach ($families as $family) {
-			$familyName = null;
+			$familyNames = array();
 			$familyItems = array();
 			foreach ($family as $id) {
-				if ($familyName === null) {
-					$familyName = $items[$id]['title'];
-				} else {
-					// Merge the names together
-				}
+				$familyNames[] = $items[$id]['title'];
 				$familyItems[$items[$id]['title']] = $items[$id]['path'];
+			}
+			if (count($family) > 3) {
+				$familyName = Model_StringCombine::combineStrings($familyNames);
 			}
 			$structure[$familyName] = $familyItems;
 		}
