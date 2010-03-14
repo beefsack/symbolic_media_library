@@ -35,8 +35,8 @@ class Model_ClassList
 					array_merge($classList, self::getClasses(array_merge($options, array('directory' => $path.'/'.$file))));
 				}
 			} else {
-				if (preg_match('/^'.preg_quote(realpath(dirname(__FILE__)), '/').'\/?(.*)\.php$/', $path.'/'.$file, $matches)) {
-					$className = 'Model_'.str_replace('/', '_', $matches[1]);
+				if (preg_match('/^'.preg_quote(realpath(dirname(__FILE__)), '/').'[\/\\\\]?(.*)\.php$/', $path.'/'.$file, $matches)) {
+					$className = 'Model_'.preg_replace('/\//', '_', $matches[1]);
 					if (!class_exists($className)) {
 						continue;
 					}
