@@ -9,7 +9,7 @@ abstract class Model_LibraryPlugin_Anime extends Model_LibraryPlugin
 //		if (preg_match('/^(the|a)\s+(.*)/i', $title, $matches)) {
 //			$title = $matches[2].', '.$matches[1];
 //		}
-		return $title;
+		return (string) $title;
 	}
 	
 	protected function _buildTitle(SimpleXMLElement $data)
