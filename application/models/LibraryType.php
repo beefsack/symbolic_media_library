@@ -253,4 +253,17 @@ abstract class Model_LibraryType
 	 */
 	abstract protected function _getData($directory);
 	
+	static public function getLibraryTypes()
+	{
+		$types = Model_ClassList::getClasses(array(
+			'parent' => 'Model_LibraryType',
+		));
+		$typeList = array();
+		foreach ($types as $type) {
+			$obj = new $type;
+			$typeList[$type] = $obj->getName();
+		}
+		return $typeList;
+	}
+	
 }

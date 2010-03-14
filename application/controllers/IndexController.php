@@ -12,6 +12,8 @@ class IndexController extends Zend_Controller_Action
     {
     	$this->view->source = $this->_getParam('source');
     	$this->view->destination = $this->_getParam('destination');
+    	$this->view->type = $this->_getParam('type');
+    	$this->view->types = Model_LibraryType::getLibraryTypes();
     }
 
 

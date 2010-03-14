@@ -36,7 +36,7 @@ function submitServerFileDialog()
 function generateLibrary()
 {
 	var params = {};
-	params.type = 'Model_LibraryType_Video';
+	params.type = $('#librarytype').val();
 	params.source = $('#source').val();
 	params.destination = $('#destination').val();
 	$('#generateStatusDialog').dialog('open');
@@ -133,17 +133,6 @@ $(document).ready(function() {
 	});
 	$('#generateStatusDialog').dialog({
 		autoOpen: false,
-//		buttons: {
-//			Cancel: function() {
-//				$('#serverFileDialog').dialog('close');
-//			},
-//			"Create Directory": function() {
-//				$('#createDirectoryDialog').dialog('open');
-//			},
-//			Select: function() {
-//				submitServerFileDialog();
-//			}
-//		},
 		closeOnEscape: false,
 		modal: true,
 		resizable: false,

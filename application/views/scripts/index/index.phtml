@@ -1,4 +1,11 @@
 <div class="option">
+	<select id="librarytype">
+		<? foreach ($this->types as $class => $type): ?>
+		<option value="<?= $class ?>"<? if ($class == $this->type): ?> selected="selected"<? endif ?>><?= $type ?></option>
+		<? endforeach ?>
+	</select>
+</div>
+<div class="option">
 	<input class="path" id="destination" disabled="disabled" value="<?= $this->destination ?>" />
 	<a href="#" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="serverFileDialog('#destination', $('#destination').val())">
 		<span class="ui-button-text">Choose Destination Directory</span>
