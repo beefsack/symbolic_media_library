@@ -210,7 +210,7 @@ abstract class Model_LibraryType
 	{
 		$strin = (string) $strin;
 		$strout = null;
-		for ($i = 0; $i < strlen($string); $i++) {
+		for ($i = 0; $i < strlen($strin); $i++) {
 //			$ord = ord($strin[$i]);
 //			if (($ord > 0 && $ord < 32) || ($ord >= 127)) {
 //				$strout .= "&amp;#{$ord};";
