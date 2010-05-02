@@ -213,7 +213,7 @@ abstract class Model_LibraryType
 						$child = $element->addChild($parent);
 						$this->_setData($child, $value, $parent);
 					} else {
-						$element->addChild($parent, $value);
+						$element->addChild($parent, htmlspecialchars($value));
 					}
 				}
 			} else {
@@ -225,7 +225,7 @@ abstract class Model_LibraryType
 					}
 					$this->_setData($child, $value, $key);
 				} else {
-					$element->addChild($key, $value);
+					$element->addChild($key, htmlspecialchars($value));
 				}
 			}
 		}
