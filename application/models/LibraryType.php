@@ -12,6 +12,8 @@ abstract class Model_LibraryType
 	protected $_pluginBase;
 	protected $_logger;
 	protected $_logPath;
+	protected $_relativeDestinationToSource;
+	protected $_commonPath;
 	
 	const DATABASE_NAME = 'sml.xml';
 	const LOG_NAME = 'sml.log';
@@ -71,6 +73,10 @@ abstract class Model_LibraryType
 		// Build structure from database
 		$this->_logger->info('Building directory structure from database.');
 		$this->_buildStructure();
+		
+		// Detect relative path
+		$this->_logger->info('Detecting relative path.');
+		$this->_getRelativePathValues();
 		
 		// Create links from structure
 		$this->_logger->info('Creating symbolic links from structure.');
@@ -264,6 +270,39 @@ abstract class Model_LibraryType
 			$typeList[$type] = $obj->getName();
 		}
 		return $typeList;
+	}
+	
+	protected function _getRelativePathValues()
+	{
+		
+		// Build directory arrays
+		
+		$sourceArray = $this->_getPathArray($this->_source);
+		$destinationArray = $this->_getPathArray($this->_destination);
+		
+		// Find common depth
+		
+		$commonDepth = 0;
+		while ($commonDepth < count($sourceArray)) {
+			if ($sourceArray[$commonDepth] != $destinationArray[$commonDepth]) {
+				break;
+			}
+			$commonDepth++;
+		}
+		
+		// Set values
+		
+		$this->_commonPath = '/'.implode('/', array_slice($sourceArray, 0, $commonDepth));
+		$this->_relativeDestinationToSource = str_repeat('../', count($destinationArray) - $commonDepth).'/'.implode('/', array_slice($sourceArray, $commonDepth));
+		
+	}
+	
+	protected function _getPathArray($path) {
+		if ($path == '/') {
+			return array();
+		} else {
+			return explode('/', preg_replace('/^\//', '', $path));
+		}
 	}
 	
 }
