@@ -2,20 +2,30 @@
 
 class Model_LibraryPlugin_Anime_Family extends Model_LibraryPlugin_Anime
 {
+	const TITLE_REPLACE = '/\s*\([^\(\)]*\)$/';
+	const MIN_FAMILY_NAME_LENGTH = 4;
+	
 	public function getStructure(SimpleXMLElement $data)
 	{
 		$items = array();
 		$families = array();
 		$structure = array();
+		
 		// Discover relations and create families based on them
+		
 		foreach ($data->item as $item) {
+			
 			$id = (int) $item['id'];
+			
 			// Create array with details for building symlinks
+			
 			$items[$id] = array(
 				'title' => $this->_buildTitle($item),
 				'path' => (string) $item->path,
 			);
+			
 			// Add to family groups
+			
 			$relatedGroups = array();
 			foreach ($families as $key => $family) {
 				// Check if any related items are in this group
@@ -26,6 +36,7 @@ class Model_LibraryPlugin_Anime_Family extends Model_LibraryPlugin_Anime
 					}
 				}
 			}
+			
 			if (count($relatedGroups > 1)) {
 				// Merge the families together
 				$newFamily = array();
@@ -40,20 +51,24 @@ class Model_LibraryPlugin_Anime_Family extends Model_LibraryPlugin_Anime
 			} else {
 				$families[][] = $id;
 			}
+			
 		}
+		
 		// Discover family names and build folders based on that
+		
 		foreach ($families as $family) {
 			$familyNames = array();
 			$familyItems = array();
 			foreach ($family as $id) {
-				$familyNames[] = $items[$id]['title'];
+				$familyNames[] = preg_replace(self::TITLE_REPLACE, '', $items[$id]['title']);
 				$familyItems[$items[$id]['title']] = $items[$id]['path'];
 			}
-			if (count($family) > 3) {
-				$familyName = Model_StringCombine::combineStrings($familyNames);
+			if (($familyName = Model_StringCombine::combineStrings($familyNames)) === false || strlen($familyName) < self::MIN_FAMILY_NAME_LENGTH) {
+				$familyName = reset($familyNames);
 			}
 			$structure[$familyName] = $familyItems;
 		}
+		
 		return array('By Family' => $structure);
 	}
 }
