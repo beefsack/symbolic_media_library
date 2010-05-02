@@ -107,8 +107,8 @@ abstract class Model_LibraryType
 				$this->_createLinks($directory.'/'.$cleanKey, $value, $depth + 1);
 			} else {
 				// Create symlink
-				$this->_logger->info('Creating symlink at '.$directory.'/'.$cleanKey.' to '.$value.'.');
-				if (file_exists($value)) {
+				$this->_logger->info('Creating symlink at '.$directory.'/'.$cleanKey.' to '.$this->_source.'/'.$value.'.');
+				if (file_exists($this->_source.'/'.$value)) {
 					if (file_exists($directory.'/'.$cleanKey)) {
 						if (is_link($directory.'/'.$cleanKey)) {
 							unlink($directory.'/'.$cleanKey);
@@ -116,7 +116,7 @@ abstract class Model_LibraryType
 							continue;
 						}
 					}
-					$target = str_repeat('../', $depth).$this->_relativeDestinationToSource.'/'.str_replace($this->_source, '', $value);
+					$target = str_repeat('../', $depth).$this->_relativeDestinationToSource.'/'.$value;
 					exec('cd '.escapeshellarg($directory).'; ln -s '.escapeshellarg($target).' '.escapeshellarg($cleanKey), $output, $return_var);
 					if ($return_var > 0) {
 						throw new Exception('Unable to make symlink at '.$directory.'/'.$cleanKey.' to '.$target);
@@ -190,7 +190,7 @@ abstract class Model_LibraryType
 			$pathinfo = pathinfo($source);
 			if (!$this->_database->xpath('//item[@id="'.str_replace('"', '&quot;', $pathinfo['basename']).'"]') && $data = $this->_getData($pathinfo['basename'])) {
 				$this->_logger->info('Fetched data for '.$pathinfo['basename'].'.');
-				$data['path'] = $source;
+				$data['path'] = str_replace($this->_source, '', $source);
 				$item = $this->_database->addChild('item');
 				$item->addAttribute('id', $pathinfo['basename']);
 				$this->_setData($item, $data);
@@ -243,7 +243,7 @@ abstract class Model_LibraryType
 	{
 		$remove = array();
 		foreach ($this->_database as $item) {
-			if (!realpath((string) $item->path)) {
+			if (!realpath($this->_source.'/'.(string) $item->path)) {
 				$remove[] = $item;
 			}
 		}
