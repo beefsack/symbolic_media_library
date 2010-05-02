@@ -60,13 +60,30 @@ class Model_LibraryPlugin_Anime_Family extends Model_LibraryPlugin_Anime
 			$familyNames = array();
 			$familyItems = array();
 			foreach ($family as $id) {
-				$familyNames[] = preg_replace(self::TITLE_REPLACE, '', $items[$id]['title']);
+				
+				// Remember the lowest ID if we can't combine the strings
+
+				if ($lowestId === null) {
+					$lowestId = (int) $id;
+				} elseif ((int) $id < $lowestId) {
+					$lowestId = (int) $id;
+				}
+				
+				// Build items arrays
+				
+				$familyNames[(int) $id] = preg_replace(self::TITLE_REPLACE, '', $items[$id]['title']);
 				$familyItems[$items[$id]['title']] = $items[$id]['path'];
+				
 			}
+			
+			// Combine the names
+			
 			if (($familyName = Model_StringCombine::combineStrings($familyNames)) === false || strlen($familyName) < self::MIN_FAMILY_NAME_LENGTH) {
-				$familyName = reset($familyNames);
+				$familyName = $familyNames[$lowestId];
 			}
+			
 			$structure[$familyName] = $familyItems;
+			
 		}
 		
 		return array('By Family' => $structure);
