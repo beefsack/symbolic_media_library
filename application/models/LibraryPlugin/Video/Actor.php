@@ -28,7 +28,7 @@ class Model_LibraryPlugin_Video_Actor extends Model_LibraryPlugin_Video
 				}
 			}
 		}
-		$structure['By Actor'] = $this->_structureByLetter($actorData);
+//		$structure['By Actor'] = $this->_structureByLetter($actorData);
 		$structure['By Actor']['_Prolific'] = $this->_structureByLetter($prolific);
 		return $structure;
 	}

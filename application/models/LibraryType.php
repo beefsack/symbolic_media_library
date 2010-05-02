@@ -205,7 +205,37 @@ abstract class Model_LibraryType
 			closedir($dir);
 		}
 	}
-
+	
+	protected function _xmlEscape($strin)
+	{
+		$strin = (string) $strin;
+		$strout = null;
+		for ($i = 0; $i < strlen($string); $i++) {
+//			$ord = ord($strin[$i]);
+//			if (($ord > 0 && $ord < 32) || ($ord >= 127)) {
+//				$strout .= "&amp;#{$ord};";
+//			} else {
+				switch ($strin[$i]) {
+					case '<':
+						$strout .= '&lt;';
+						break;
+					case '>':
+						$strout .= '&gt;';
+						break;
+					case '&':
+						$strout .= '&amp;';
+						break;
+					case '"':
+						$strout .= '&quot;';
+						break;
+					default:
+						$strout .= $strin[$i];
+				}
+//			}
+		}
+		return $strout;
+	}
+					 
 	/**
 	 * Recurses an array to set data to simplexml elements
 	 * @param $element
@@ -221,7 +251,7 @@ abstract class Model_LibraryType
 						$child = $element->addChild($parent);
 						$this->_setData($child, $value, $parent);
 					} else {
-						$element->addChild($parent, htmlspecialchars($value));
+						$element->addChild($parent, $this->_xmlEscape($value));
 					}
 				}
 			} else {
@@ -233,7 +263,7 @@ abstract class Model_LibraryType
 					}
 					$this->_setData($child, $value, $key);
 				} else {
-					$element->addChild($key, htmlspecialchars($value));
+					$element->addChild($key, $this->_xmlEscape($value));
 				}
 			}
 		}
