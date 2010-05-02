@@ -85,7 +85,7 @@ abstract class Model_LibraryType
 		$this->_logger->info('Library generation successful.');
 	}
 	
-	protected function _createLinks($directory, array $structure)
+	protected function _createLinks($directory, array $structure, $depth = 0)
 	{
 		if (($directory = realpath($directory)) === false) {
 			throw new Exception('Could not find directory');
@@ -104,7 +104,7 @@ abstract class Model_LibraryType
 				} else {
 					mkdir($directory.'/'.$cleanKey);
 				}
-				$this->_createLinks($directory.'/'.$cleanKey, $value);
+				$this->_createLinks($directory.'/'.$cleanKey, $value, $depth + 1);
 			} else {
 				// Create symlink
 				$this->_logger->info('Creating symlink at '.$directory.'/'.$cleanKey.' to '.$value.'.');
@@ -116,8 +116,10 @@ abstract class Model_LibraryType
 							continue;
 						}
 					}
-					if (!symlink($value, $directory.'/'.$cleanKey)) {
-						throw new Exception('Unable to make symlink at '.$directory.'/'.$cleanKey.' to '.$value);
+					$target = str_repeat('../', $depth).$this->_relativeDestinationToSource.'/'.str_replace($this->_source, '', $value);
+					exec('cd '.escapeshellarg($directory).'; ln -s '.escapeshellarg($target).' '.escapeshellarg($cleanKey), $output, $return_var);
+					if ($return_var > 0) {
+						throw new Exception('Unable to make symlink at '.$directory.'/'.$cleanKey.' to '.$target);
 					}
 				}
 			}
