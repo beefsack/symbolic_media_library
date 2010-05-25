@@ -14,6 +14,10 @@ abstract class Model_LibraryType
 	protected $_logPath;
 	protected $_relativeDestinationToSource;
 	protected $_commonPath;
+	protected $_replaceRules = array(
+		'/:/' => '-',
+		'/\//' => '-',
+	);
 	
 	const DATABASE_NAME = 'sml.xml';
 	const LOG_NAME = 'sml.log';
@@ -94,7 +98,8 @@ abstract class Model_LibraryType
 			throw new Exception($directory.' is not a directory for generating links');
 		}
 		foreach ($structure as $key => &$value) {
-			$cleanKey = str_replace('/', '-', $key);
+			// Clean the key
+			$cleanKey = $this->_replace($key);
 			if (is_array($value)) {
 				// Create dir if needed and keep recursing
 				if (file_exists($directory.'/'.$cleanKey)) {
@@ -329,12 +334,21 @@ abstract class Model_LibraryType
 		
 	}
 	
-	protected function _getPathArray($path) {
+	protected function _getPathArray($path)
+	{
 		if ($path == '/') {
 			return array();
 		} else {
 			return explode('/', preg_replace('/^\//', '', $path));
 		}
+	}
+	
+	protected function _replace($string)
+	{
+		foreach ($this->_replaceRules as $rule => $replacement) {
+			$string = preg_replace($rule, $replacement, $string);
+		}
+		return $string;
 	}
 	
 }
