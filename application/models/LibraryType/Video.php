@@ -23,6 +23,21 @@ class Model_LibraryType_Video extends Model_LibraryType
 			return array();
 		}
 		
-		return $data;
+		// Clean encodings out of data
+		
+		return $this->_decodeValues($data);
+	}
+	
+	protected function _decodeValues($data)
+	{
+		if (is_array($data)) {
+			$returnArray = array();
+			foreach ($data as $key => &$value) {
+				$returnArray[html_entity_decode($key, ENT_COMPAT, 'UTF-8')] = $this->_decodeValues($value);
+			}
+			return $returnArray;
+		} else {
+			return html_entity_decode($data, ENT_COMPAT, 'UTF-8');
+		}
 	}
 }
