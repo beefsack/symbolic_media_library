@@ -30,6 +30,7 @@ abstract class Model_LibraryType
 	public function generateLibrary()
 	{
 		set_time_limit(0); // This script may take a long time
+		setlocale(LC_CTYPE, "UTF8", "en_US.UTF-8"); // To fix shell escaping
 		
 		// Check properties
 		if ($this->_source === null || $this->_destination === null) {
