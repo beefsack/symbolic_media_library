@@ -216,27 +216,22 @@ abstract class Model_LibraryType
 		$strin = (string) $strin;
 		$strout = null;
 		for ($i = 0; $i < strlen($strin); $i++) {
-//			$ord = ord($strin[$i]);
-//			if (($ord > 0 && $ord < 32) || ($ord >= 127)) {
-//				$strout .= "&amp;#{$ord};";
-//			} else {
-				switch ($strin[$i]) {
-					case '<':
-						$strout .= '&lt;';
-						break;
-					case '>':
-						$strout .= '&gt;';
-						break;
-					case '&':
-						$strout .= '&amp;';
-						break;
-					case '"':
-						$strout .= '&quot;';
-						break;
-					default:
-						$strout .= $strin[$i];
-				}
-//			}
+			switch ($strin[$i]) {
+				case '<':
+					$strout .= '&lt;';
+					break;
+				case '>':
+					$strout .= '&gt;';
+					break;
+				case '&':
+					$strout .= '&amp;';
+					break;
+				case '"':
+					$strout .= '&quot;';
+					break;
+				default:
+					$strout .= $strin[$i];
+			}
 		}
 		return $strout;
 	}

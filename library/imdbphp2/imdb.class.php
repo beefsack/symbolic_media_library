@@ -9,7 +9,7 @@
  # under the terms of the GNU General Public License (see doc/LICENSE)       #
  #############################################################################
 
- /* $Id: imdb.class.php 362 2010-04-22 17:56:13Z izzy $ */
+ /* $Id: imdb.class.php 385 2010-05-20 19:46:08Z izzy $ */
 
  require_once (dirname(__FILE__)."/movie_base.class.php");
 
@@ -23,7 +23,7 @@
   * @author Georgos Giagas
   * @author Izzy (izzysoft AT qumran DOT org)
   * @copyright (c) 2002-2004 by Giorgos Giagas and (c) 2004-2009 by Itzchak Rehberg and IzzySoft
-  * @version $Revision: 362 $ $Date: 2010-04-22 19:56:13 +0200 (Do, 22. Apr 2010) $
+  * @version $Revision: 385 $ $Date: 2010-05-20 21:46:08 +0200 (Do, 20. Mai 2010) $
   */
  class imdb extends movie_base {
 
@@ -35,7 +35,7 @@
    */
   function __construct($id) {
     parent::__construct($id);
-    $this->revision = preg_replace('|^.*?(\d+).*$|','$1','$Revision: 362 $');
+    $this->revision = preg_replace('|^.*?(\d+).*$|','$1','$Revision: 385 $');
     $this->setid($id);
   }
 
@@ -129,7 +129,7 @@
       if ($this->page["Title"] == "") $this->openpage ("Title");
       if (@preg_match("/\<title\>(.*)\<\/title\>/",$this->page["Title"],$match)) {
         if (preg_match_all('|\(([^\)]*)\)|',$match[1],$matches)) {
-	  for ($i=0;$i<count($matches[0]);++$i) if (!preg_match('|^\d{4}$|',$matches[1][$i])) $this->main_movietypes[] = $matches[1][$i];
+      for ($i=0;$i<count($matches[0]);++$i) if (!preg_match('|^\d{4}$|',$matches[1][$i])) $this->main_movietypes[] = $matches[1][$i];
         }
       }
     }
@@ -361,7 +361,7 @@
   public function tagline() {
     if ($this->main_tagline == "") {
       if ($this->page["Title"] == "") $this->openpage ("Title");
-      if (@preg_match("/Tagline:\<\/h5\>\s*\n(.*?)(<\/div|<a class=\"tn15more)/ms",$this->page["Title"],$match)) {
+      if (@preg_match('/Tagline:\<\/h5\>\s*<div class="info-content">\s*(.*?)(<\/div|<a class="tn15more)/ms',$this->page["Title"],$match)) {
         $this->main_tagline = trim($match[1]);
       }
     }
@@ -453,10 +453,10 @@
     if (strpos($req->getResponseHeader("Content-Type"),'image/jpeg') === 0
       || strpos($req->getResponseHeader("Content-Type"),'image/gif') === 0
       || strpos($req->getResponseHeader("Content-Type"), 'image/bmp') === 0 ){
-	$fp = $req->getResponseBody();
+    $fp = $req->getResponseBody();
     }else{
-	$this->debug_scalar("<BR>*photoerror* ".$photo_url.": Content Type is '".$req->getResponseHeader("Content-Type")."'<BR>");
-	return false;
+    $this->debug_scalar("<BR>*photoerror* ".$photo_url.": Content Type is '".$req->getResponseHeader("Content-Type")."'<BR>");
+    return false;
     }
     $fp2 = fopen ($path, "w");
     if ((!$fp) || (!$fp2)){
@@ -504,13 +504,13 @@
     if (empty($this->main_pictures)) {
       if (@preg_match_all("/\<div class=\"media_strip_thumb\">\<a href=\"(.*?)\">\<img height=\"90\" width=\"90\" src\=\"(.*?)\"/",$this->page["Title"],$matches)) {
         for ($i=0;$i<count($matches[0]);++$i) {
-	  $this->main_pictures[$i]["imgsrc"] = $matches[2][$i];
+      $this->main_pictures[$i]["imgsrc"] = $matches[2][$i];
           if (substr($matches[1][$i],0,4)!="http") $matches[1][$i] = "http://".$this->imdbsite.$matches[1][$i];
           $this->main_pictures[$i]["imglink"] = $matches[1][$i];
           preg_match('|(.*\._V1).*|iUs',$matches[2][$i],$big);
           $ext = substr($matches[2][$i],-3);
           $this->main_pictures[$i]["bigsrc"] = $big[1].".${ext}";
-	}
+    }
       }
     }
     return $this->main_pictures;
@@ -553,7 +553,6 @@
     if ($ak_s == 0) return array();
     $alsoknow_end = strpos ($this->page["Title"], "</div>", $ak_s);
     $alsoknow_all = substr($this->page["Title"], $ak_s, $alsoknow_end - $ak_s);
-
     $aka_arr = explode("<br>",str_replace("\n","",$alsoknow_all));
     foreach ($aka_arr as $aka) {
       $aka = trim($aka);
@@ -562,23 +561,22 @@
       if ( strpos($aka,'tn15more')!==FALSE ) break;
       preg_match('!"(.*?)"\s*-\s*(.*)!ims',$aka,$match);
       $title = $match[1];
-      if ( preg_match('!(.*?)\s*(<em>.*</em>)!ims',$match[2],$match2) ) {
-        $country = $match2[1];
-        preg_match_all('!<em>\((.*?)\)</em>!ims',$match2[2],$matches);
+      $countries = explode( ', ', $match[2] );
+      foreach( $countries as $country ){
         $comment = '';
-        for ($i=0;$i<count($matches[0]);++$i) $comment .= ', '.$matches[1][$i];
-        $comment = substr($comment,2);
-      } else {
-        $country = $match[2];
-        $comment = '';
+        if ( preg_match('!(.*?)\s*(<em>.*</em>)!ims',$country,$match2) ) {
+            $country = $match2[1];
+            preg_match_all('!<em>\((.*?)\)</em>!ims',$match2[2],$matches);
+            $comment = implode( ', ', $matches[1] );
+        }
+        $this->akas[] = array(
+            "title"=>preg_replace('|(\<.*?\>)|','',$title),
+            "year"=>'',
+            "country"=>preg_replace('|(\<.*?\>)|','',$country),
+            "comment"=>preg_replace('|(\<.*?\>)|','',$comment),
+            "lang"=>''
+        );
       }
-      $this->akas[] = array(
-        "title"=>preg_replace('|(\<.*?\>)|','',$title),
-        "year"=>'',
-        "country"=>preg_replace('|(\<.*?\>)|','',$country),
-        "comment"=>preg_replace('|(\<.*?\>)|','',$comment),
-        "lang"=>''
-      );
     }
    }
    return $this->akas;
@@ -657,11 +655,11 @@
    if (empty($this->main_prodnotes)) {
     if ($this->page["Title"] == "") $this->openpage ("Title");
     if (!preg_match('!(<h3>Production Notes.*?)<h3!ims',$this->page["Title"],$match)) return $this->main_prodnotes; // no info available
-    preg_match('!<h5>Status:</h5>\s*(.*?)\|(.*?)</div>!ims',$match[1],$tmp);
+    preg_match('!<h5>Status:</h5>\s*<div class="info-content">\s*(.*?)\|(.*?)</div>!ims',$match[1],$tmp);
     $status = trim($tmp[1]); $statnote = trim($tmp[2]);
     preg_match('!<h5>Status Updated:</h5>\s*(\d+)\s*(\D+)\s+(\d{4})!ims',$match[1],$tmp);
     $update = array("day"=>$tmp[1],"month"=>$tmp[2],"mon"=>$this->monthNo($tmp[2]),"year"=>$tmp[3]);
-    preg_match('!<h5>More Info:</h5>\s*(.*?)</div!ims',$match[1],$tmp);
+    preg_match('!<h5>More Info:</h5>\s*<div class="info-content">\s*(.*?)</div!ims',$match[1],$tmp);
     $more = trim($tmp[1]);
     preg_match('!<h5>Note:</h5>\s*<span class="note">\s*(.*?)</span!ims',$match[1],$tmp);
     $note = trim($tmp[1]);
@@ -814,7 +812,7 @@
    $endtable = strpos($html, "</table>", $row_s);
    $table_string = substr($html,$row_s,$endtable - $row_s);
    if (preg_match_all("/<tr>(.*?)<\/tr>/ims",$table_string,$matches)) {
-	 return $matches[1];
+     return $matches[1];
    }
    return $rows;
   }
@@ -860,14 +858,14 @@
    $director_rows = $this->get_table_rows($this->page["Credits"], "Directed by");
    if($director_rows==null) $director_rows = $this->get_table_rows($this->page["Credits"], "Series Directed by");
    for ( $i = 0; $i < count ($director_rows); $i++){
-	$cels = $this->get_row_cels ($director_rows[$i]);
-	if (!isset ($cels[0])) return array();
-	$dir["imdb"] = $this->get_imdbname($cels[0]);
-	$dir["name"] = strip_tags($cels[0]);
-	$role = trim(strip_tags($cels[2]));
-	if ( $role == "") $dir["role"] = NULL;
-	else $dir["role"] = $role;
-	$this->credits_director[$i] = $dir;
+    $cels = $this->get_row_cels ($director_rows[$i]);
+    if (!isset ($cels[0])) return array();
+    $dir["imdb"] = $this->get_imdbname($cels[0]);
+    $dir["name"] = strip_tags($cels[0]);
+    $role = trim(strip_tags($cels[2]));
+    if ( $role == "") $dir["role"] = NULL;
+    else $dir["role"] = $role;
+    $this->credits_director[$i] = $dir;
    }
    return $this->credits_director;
   }
@@ -885,17 +883,17 @@
    }
    $cast_rows = $this->get_table_rows_cast($this->page["Credits"], "Cast", "hs");
    for ( $i = 0; $i < count ($cast_rows); $i++){
-	$cels = $this->get_row_cels ($cast_rows[$i]);
-	if (!isset ($cels[0])) return array();
-	$dir["imdb"] = $this->get_imdbname($cels[1]);
-	$dir["name"] = strip_tags($cels[1]);
-	$role = strip_tags($cels[3]);
-	if ( $role == "") $dir["role"] = NULL;
-	else $dir["role"] = $role;
-	$dir["thumb"] = preg_replace('|.*<img src="(.*?)".*|is','$1',$cels[0]);
-	if (strpos($dir["thumb"],'@@._V1'))
-	  $dir["photo"] = preg_replace('|(.*\@\@._V1)\..+\.(.*)|is','$1.$2',$dir["thumb"]);
-	$this->credits_cast[$i] = $dir;
+    $cels = $this->get_row_cels ($cast_rows[$i]);
+    if (!isset ($cels[0])) return array();
+    $dir["imdb"] = $this->get_imdbname($cels[1]);
+    $dir["name"] = strip_tags($cels[1]);
+    $role = strip_tags($cels[3]);
+    if ( $role == "") $dir["role"] = NULL;
+    else $dir["role"] = $role;
+    $dir["thumb"] = preg_replace('|.*<img src="(.*?)".*|is','$1',$cels[0]);
+    if (strpos($dir["thumb"],'@@._V1'))
+      $dir["photo"] = preg_replace('|(.*\@\@._V1)\..+\.(.*)|is','$1.$2',$dir["thumb"]);
+    $this->credits_cast[$i] = $dir;
    }
    return $this->credits_cast;
   }
@@ -1248,22 +1246,20 @@
       $tag_s = strpos($this->page["ReleaseInfo"],'<th class="xxxx">Country</th><th class="xxxx">Date</th>');
       $tag_e = strpos($this->page["ReleaseInfo"],'</table',$tag_s);
       $block = substr($this->page["ReleaseInfo"],$tag_s,$tag_e-$tag_s);
-      preg_match_all('!<tr><td><b><a href="/Recent/(.*?)</td></tr>!ims',$block,$matches);
+      preg_match_all('!<tr><td><b>(.*?)</b></td>\s*<td[^>]*>(.*?)</td>\s*<td>(.*?)</td>!ims',$block,$matches);
       $mc = count($matches[0]);
       for ($i=0;$i<$mc;++$i) {
-        $date = '!!';
-        if ( preg_match('/.*?">(.*?)<.*?<td.*?href=.*\/date\/(\d+)-(\d+).*">\d+\s*(.*?)<.*?>(\d{4})<.*?<td>\s*(\((.*?)\)\s*|)$/ims',$matches[1][$i],$match) ) {
-          $this->release_info[] = array("country"=>$match[1],"day"=>$match[3],"month"=>$match[4],"mon"=>$match[2],"year"=>$match[5],"comment"=>$match[7]);
-        } elseif ( preg_match('!>(.*?)</a>\s*</b></td>\s*<td align="right">\s*([A-Za-z]+)\s*(\d{4})\s*</td>\s*<td>(\((.*?)\)|\s*)$!ims',$matches[1][$i],$match) ) {
-          if ( empty($match[5]) ) $this->release_info[] = array("country"=>$match[1],"day"=>"","month"=>$match[2],"mon"=>$this->monthNo($match[2]),"year"=>$match[3],"comment"=>"");
-          else $this->release_info[] = array("country"=>$match[1],"day"=>"","month"=>$match[2],"mon"=>$this->monthNo($match[2]),"year"=>$match[3],"comment"=>$match[5]);
-	} elseif ( preg_match('|.*?">(.*?)</a>\s*</b></td>\s*<td align="right">\s(\d{4})</td>\s*(<td>\s*(.*))|ims',$matches[1][$i],$match) ) { // unlinked data, year only plus comment
-	  if ( empty($match[3]) ) $this->release_info[] = array("country"=>$match[1],"day"=>"","month"=>"","mon"=>'',"year"=>$match[2],"comment"=>"");
-	  $this->release_info[] = array("country"=>$match[1],"day"=>"","month"=>"","mon"=>'',"year"=>$match[2],"comment"=>$match[4]);
-	} elseif ( preg_match('|">(.*?)<.*?">\s*(\D*)\s*(\d+)<.*<td>(.*)|ims',$matches[1][$i],$match) ) {
-	  $this->release_info[] = array("country"=>$match[1],"day"=>'',"month"=>trim($match[2]),"mon"=>$this->monthNo(trim($match[2])),"year"=>$match[3],"comment"=>$match[4]);
+        $country = strip_tags($matches[1][$i]);
+        if ( preg_match('!href="/date/(\d{2})-(\d{2})/">\d+ (.*?)</a>\s*<a href="/year/(\d{4})/">!is',$matches[2][$i],$match) ) { // full info
+          $this->release_info[] = array('country'=>$country,'day'=>$match[2],'month'=>$match[3],'mon'=>$match[1],'year'=>$match[4],'comment'=>$matches[3][$i]);
+        } elseif ( !preg_match('|a href=|i',$matches[2][$i],$match) ) { // no links within
+          if ( preg_match('!^(.+?)\s(\d{4})$!s',trim($matches[2][$i]),$match) ) { // month and year
+            $this->release_info[] = array('country'=>$country,'day'=>'','month'=>$match[1],'mon'=>$this->monthNo(trim($match[1])),'year'=>$match[2],'comment'=>$matches[3][$i]);
+          } elseif ( preg_match('!(\d{4})!',trim($matches[2][$i]),$match) ) { // year at least
+            $this->release_info[] = array('country'=>$country,'day'=>'','month'=>'','mon'=>'','year'=>$match[1],'comment'=>$matches[3][$i]);
+          }
         } else {
-          $this->debug_scalar("NO MATCH ON<pre>".htmlentities($matches[1][$i])."</pre>");
+          $this->debug_scalar("NO MATCH ON<pre>".htmlentities($matches[2][$i])."</pre>");
         }
       }
     }
@@ -1430,7 +1426,7 @@
   #--------------------------------------------------------------[ Awards ]---
   /** Get the complete awards for the movie
    * @method awards
-   * @return array awards array[festivalName]['entries'][0..n] of array[year,won,category,award,people]
+   * @return array awards array[festivalName]['entries'][0..n] of array[year,won,category,award,people,comment]
    * @see IMDB page /awards
    * @author Qvist
    * @brief array[festivalName] is array[name,entries] - where name is a string,
@@ -1441,42 +1437,45 @@
       if ($this->page["Awards"] == "") $this->openpage("Awards");
       $award_rows = $this->get_table_rows_awards($this->page["Awards"]);
       $rowcount = count ($award_rows);
-      $festival = ""; $year = 0; $won = false; $award = ""; $people = array(); $nr = 0;
+      $festival = ""; $year = 0; $won = false; $award = ""; $comment = ""; $people = array(); $nr = 0;
       for ( $i = 0; $i < $rowcount; $i++){
-    	$cels = $this->get_row_cels ($award_rows[$i]);
-    	if( count ($cels) == 0 ){ continue; }
-    	if( count ($cels) == 1 && preg_match( '|<big><a href\="/Sections/Awards/([^\/]+)/">(.*?)</a></big>|', $cels[0], $matches ) ){ 
-          $festival = $matches[1];
-          $this->awards[$festival]['name'] = $matches[2];
-          $nr = 0;
+        $cels = $this->get_row_cels ($award_rows[$i]);
+        if( count ($cels) == 0 ){ continue; }
+        if( count ($cels) == 1 && preg_match( '|<big><a href\="/Sections/Awards/([^\/]+)/">(.*?)</a></big>|s', $cels[0], $matches ) ){
+            $festival = $matches[1];
+            $this->awards[$festival]['name'] = $matches[2];
+            $nr = 0;
         }
-        if( count ($cels) == 4 && preg_match( '|<a href\="/Sections/Awards/'.$festival.'/\d{4}">(\d{4}) </a>|', $cels[0], $matches ) ){ 
-          $year = $matches[1]; 
-          array_shift( $cels );
+        if( count ($cels) == 4 && preg_match( '|<a href\="/Sections/Awards/'.quotemeta( $festival ).'/[\d-]+">(\d{4}) </a>|s', $cels[0], $matches ) ){
+            $year = $matches[1];
+            array_shift( $cels );
         }
-        if( count ($cels) == 3 && preg_match( '|<b>(.*?)</b>|', $cels[0], $matches ) ){ 
-          $won = ($matches[1]=="Won")?true:false;
-          array_shift( $cels );
+        if( count ($cels) == 3 && preg_match( '|<b>(.*?)</b>|s', $cels[0], $matches ) ){
+            $won = ($matches[1]=="Won")?true:false;
+            array_shift( $cels );
         }
-        if( count ($cels) == 2 && strpos( $cels[0], "<" ) === false ){ 
-          $award = $cels[0];
-          array_shift( $cels );
+        if( count ($cels) == 2 && strpos( $cels[0], "<" ) === false ){
+            $award = $cels[0];
+            array_shift( $cels );
         }
-        if( count ($cels) == 1 && preg_match( '|([^<]*)<br>(.*)|s', $cels[0], $matches ) ){ 
-          $category = trim( $matches[1] );
-          preg_match_all( '|<a href\="/name/nm(\d{7})/">(.*?)</a>|', $matches[2], $matches );
-          $people = isset( $matches[1] )?@array_combine( $matches[1], $matches[2] ):array();
-          array_shift( $cels );
-          $nr++;
+        if( count ($cels) == 1 && preg_match( '|([^<]*)<br>(.*)<small>|s', $cels[0], $matches ) ){
+            $category = trim( $matches[1] );
+            preg_match_all( '|<a href\="/name/nm(\d{7})/">(.*?)</a>|s', $matches[2], $matches );
+            $people = isset( $matches[0][0] )?array_combine( $matches[1], $matches[2] ):array();
+            preg_match( '|<small>(.*?)</small>|s', $cels[0], $matches );
+            $comment = isset( $matches[1] )?strip_tags( $matches[1] ):'';
+            array_shift( $cels );
+            $nr++;
         }
         if( count ($cels) == 0 ){
-          $this->awards[$festival]['entries'][$nr] = array(
-            'year' => $year, 'won' => $won, 'category' => $category, 'award' => $award, 'people' => $people );
+            $this->awards[$festival]['entries'][$nr] = array(
+                'year' => $year, 'won' => $won, 'category' => $category, 'award' => $award, 'people' => $people, 'comment' => $comment );
         }
       }
     }
     return $this->awards;
   }
+
 
  } // end class imdb
 

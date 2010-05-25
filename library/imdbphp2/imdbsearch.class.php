@@ -9,7 +9,7 @@
  # under the terms of the GNU General Public License (see doc/LICENSE)       #
  #############################################################################
 
- /* $Id: imdbsearch.class.php 323 2010-02-21 20:05:46Z izzy $ */
+ /* $Id: imdbsearch.class.php 386 2010-05-22 22:56:46Z izzy $ */
 
  require_once (dirname(__FILE__)."/browseremulator.class.php");
  if (defined('IMDBPHP_CONFIG')) require_once (IMDBPHP_CONFIG);
@@ -24,7 +24,7 @@
   * @extends mdb_config
   * @author Izzy (izzysoft AT qumran DOT org)
   * @copyright (c) 2002-2004 by Giorgos Giagas and (c) 2004-2008 by Itzchak Rehberg and IzzySoft
-  * @version $Revision: 323 $ $Date: 2010-02-21 21:05:46 +0100 (So, 21. Feb 2010) $
+  * @version $Revision: 386 $ $Date: 2010-05-23 00:56:46 +0200 (So, 23. Mai 2010) $
   */
  class imdbsearch extends mdb_base {
   var $page = "";
@@ -38,6 +38,7 @@
   function __construct() {
     parent::__construct('');
     $this->search_episodes(FALSE);
+    $this->last_results = 0;
   }
 
   /** Search for episodes or movies
@@ -101,10 +102,11 @@
 
   /** Setup search results
    * @method results
-   * @param optional string URL Replace search URL by your own
+   * @param optional string URL Replace search URL by your own (Default: empty string)
+   * @param optional boolean series whether to include TV series in search results (default: TRUE)
    * @return array results array of objects (instances of the imdb class)
    */
-  public function results($url="") {
+  public function results($url="",$series=TRUE) {
     if ($this->page == "") {
       if ($this->usecache && empty($url)) { // Try to read from cache
         $this->cache_read(urlencode(strtolower($this->name)).'.search',$this->page);
@@ -142,29 +144,18 @@
     } // end (page="")
 
     // now we have the search content - go and parse it!
-    $searchstring = array( '<A HREF="/title/tt', '<A href="/title/tt', '<a href="/Title?', '<a href="/title/tt');
-    $i = 0;
     if ($this->maxresults > 0) $maxresults = $this->maxresults; else $maxresults = 999999;
-    foreach($searchstring as $srch){
-      $res_e = 0;
-      $res_s = 0;
+    if ( preg_match_all('!href="/title/tt(\d{7})/"[^>]*>(.*?)</a>\s*(\((\d{4})\)|)[^<]*(<small>(.*?)</small>|)!ims',$this->page,$matches) ) {
+      $this->last_results = count($matches[0]);
       $mids_checked = array();
-      $len = strlen($srch);
-      while ((($res_s = strpos ($this->page, $srch, $res_e)) > 10)) {
-        if ($i == $maxresults) break(2); // limit result count
-        $res_e = strpos ($this->page, "(", $res_s);
-        $imdb_id = substr($this->page, $res_s + $len, 7);
-        $ts = strpos($this->page, ">",$res_s) +1; // >movie title</a>
-        $te = strpos($this->page,"<",$ts);
-        $title = substr($this->page,$ts,$te-$ts);
-        if (($title == "") || (in_array($imdb_id,$mids_checked))) continue; // empty titles just come from the images
-        $mids_checked[] = $imdb_id;
-        $tmpres = new imdb ($imdb_id); // make a new imdb object by id
-        $tmpres->main_title = $title;
-        $ts = strpos($this->page,"(",$te) +1;
-        $te = strpos($this->page,")",$ts);
-        $tmpres->main_year=substr($this->page,$ts,$te-$ts);
-        $i++;
+      for ($i=0;$i<$this->last_results;++$i) {
+        if (count($this->resu) == $maxresults) break; // limit result count
+        if ( empty($matches[2][$i]) || substr(trim($matches[2][$i]),0,4)=='<img' || in_array($matches[1][$i],$mids_checked) ) continue; // empty titles just come from the images
+        if ( !$series && (preg_match('!&#x22;.+&#x22;!',($matches[2][$i])) || strpos(strtoupper($matches[6][$i]),'TV SERIES')!==FALSE) ) continue; // skip series if commanded so
+        $mids_checked[] = $matches[1][$i];
+        $tmpres = new imdb($matches[1][$i]); // make a new imdb object by id
+        $tmpres->main_title = $matches[2][$i];
+        $tmpres->main_year  = $matches[4][$i];
         $this->resu[] = $tmpres;
       }
     }

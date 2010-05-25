@@ -9,7 +9,7 @@
  # under the terms of the GNU General Public License (see doc/LICENSE)       #
  #############################################################################
 
- /* $Id: mdb_request.class.php 366 2010-04-25 15:57:10Z izzy $ */
+ /* $Id: mdb_request.class.php 384 2010-05-18 18:20:23Z izzy $ */
 
 if ( $PEAR ) { // Use the HTTP_Request class from the PEAR project.
   require_once("HTTP/Request.php");
@@ -20,7 +20,9 @@ if ( $PEAR ) { // Use the HTTP_Request class from the PEAR project.
         $this->setProxy(PROXY, PROXY_PORT);
       }
       $this->_allowRedirects = false;
-      $this->addHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
+      if ( in_array('HTTP_USER_AGENT',array_keys($_SERVER)) ) $user_agent = $_SERVER['HTTP_USER_AGENT'];
+      else $user_agent = 'Mozilla/5.0 (X11; U; Linux i686; de; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3';
+      $this->addHeader("User-Agent", $user_agent);
     }
     function getLastResponseHeaders($url) {
       $head = $this->head($url);
@@ -47,7 +49,7 @@ if ( $PEAR ) { // Use the HTTP_Request class from the PEAR project.
       else $this->BrowserEmulator();
       $this->urltoopen = $url;
       if ( substr(get_class($this),0,4)=="imdb" ) $this->addHeaderLine('Referer','http://' . $this->imdbsite . '/');
-      else $this->addHeaderLine('Referer',$_SERVER['HTTP_REFERER']);
+      elseif ( in_array('HTTP_REFERER',array_keys($_SERVER)) ) $this->addHeaderLine('Referer',$_SERVER['HTTP_REFERER']);
     }
     /** Send a request to the movie site
      * @method sendRequest

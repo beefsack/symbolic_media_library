@@ -9,7 +9,7 @@
  # under the terms of the GNU General Public License (see doc/LICENSE)       #
  #############################################################################
 
- /* $Id: imdb_person.class.php 332 2010-02-23 20:47:23Z izzy $ */
+ /* $Id: imdb_person.class.php 381 2010-05-05 23:46:47Z izzy $ */
 
  require_once (dirname(__FILE__)."/person_base.class.php");
  require_once (dirname(__FILE__)."/imdbsearch.class.php");
@@ -21,7 +21,7 @@
   * @extends mdb_base
   * @author Izzy (izzysoft AT qumran DOT org)
   * @copyright 2008 by Itzchak Rehberg and IzzySoft
-  * @version $Revision: 332 $ $Date: 2010-02-23 21:47:23 +0100 (Di, 23. Feb 2010) $
+  * @version $Revision: 381 $ $Date: 2010-05-06 01:46:47 +0200 (Do, 06. Mai 2010) $
   */
  class imdb_person extends person_base {
 
@@ -52,7 +52,7 @@
    */
   function __construct($id) {
     parent::__construct($id);
-    $this->revision = preg_replace('|^.*?(\d+).*$|','$1','$Revision: 332 $');
+    $this->revision = preg_replace('|^.*?(\d+).*$|','$1','$Revision: 381 $');
     $this->setid($id);
   }
 
@@ -366,9 +366,9 @@
       if ($this->page["Bio"] == "") $this->openpage ("Bio","person");
       if ( preg_match('|Date of Birth</h5>\s*(.*)<br|iUms',$this->page["Bio"],$match) ) {
         preg_match('|/date/(\d+)-(\d+)/.*?>\d+\s+(.*?)<|',$match[1],$daymon);
-	preg_match('|/search/name\?birth_year=(\d{4})|ims',$match[1],$dyear);
-	preg_match('|/search/name\?birth_place=.*?">(.*)<|ims',$match[1],$dloc);
-        $this->birthday = array("day"=>$daymon[2],"month"=>$daymon[3],"mon"=>$$daymon[1],"year"=>$dyear[1],"place"=>$dloc[1]);
+        preg_match('|/search/name\?birth_year=(\d{4})|ims',$match[1],$dyear);
+        preg_match('|/search/name\?birth_place=.*?">(.*)<|ims',$match[1],$dloc);
+        $this->birthday = array("day"=>$daymon[2],"month"=>$daymon[3],"mon"=>$daymon[1],"year"=>$dyear[1],"place"=>$dloc[1]);
       }
     }
     return $this->birthday;
@@ -747,7 +747,7 @@
   * @extends imdbsearch
   * @author Izzy (izzysoft AT qumran DOT org)
   * @copyright 2008-2009 by Itzchak Rehberg and IzzySoft
-  * @version $Revision: 332 $ $Date: 2010-02-23 21:47:23 +0100 (Di, 23. Feb 2010) $
+  * @version $Revision: 381 $ $Date: 2010-05-06 01:46:47 +0200 (Do, 06. Mai 2010) $
   */
  class imdbpsearch extends imdbsearch {
  #-----------------------------------------------------------[ Constructor ]---
