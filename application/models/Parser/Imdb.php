@@ -34,7 +34,7 @@ class Model_Parser_Imdb extends Model_Parser
 	
 	protected function _quoteTrim($string)
 	{
-		if (preg_match('/^&#x22;(.*)"&#x22;/', $string, $matches)) {
+		if (preg_match('/^&#x22;(.*)&#x22;$/', $string, $matches)) {
 			return $matches[1];
 		}
 		return $string;
