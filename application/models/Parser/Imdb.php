@@ -25,11 +25,19 @@ class Model_Parser_Imdb extends Model_Parser
 			$this->_data['language'] = $data->language();
 			$this->_data['rating'] = (float) $data->rating();
 			$this->_data['runtime'] = (int) $data->runtime();
-			$this->_data['title'] = $data->title();
+			$this->_data['title'] = $this->_quoteTrim($data->title());
 			$this->_data['votes'] = (int) str_replace(',', '', $data->votes());
 			$this->_data['year'] = (int) $data->year();
 		}
 		return $this->_data;
+	}
+	
+	protected function _quoteTrim($string)
+	{
+		if (preg_match('/^"(.*)"$/', $string, $matches)) {
+			return $matches[1];
+		}
+		return $string;
 	}
 	
 }
