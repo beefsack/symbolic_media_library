@@ -8,7 +8,7 @@
  # under the terms of the GNU General Public License (see doc/LICENSE)       #
  #############################################################################
 
- /* $Id: pilot.class.php 367 2010-04-25 16:21:55Z izzy $ */
+ /* $Id: pilot.class.php 420 2010-10-12 18:59:06Z izzy $ */
 
  require_once(dirname(__FILE__)."/movie_base.class.php");
  if (PILOT_IMDBFALLBACK) require_once(dirname(__FILE__)."/imdb.class.php");
@@ -22,7 +22,7 @@
   * @extends movie_base
   * @author Izzy (izzysoft AT qumran DOT org)
   * @copyright (c) 2009 by Itzchak Rehberg and IzzySoft
-  * @version $Revision: 367 $ $Date: 2010-04-25 18:21:55 +0200 (So, 25. Apr 2010) $
+  * @version $Revision: 420 $ $Date: 2010-10-12 20:59:06 +0200 (Di, 12. Okt 2010) $
   */
  class pilot extends movie_base {
 
@@ -36,7 +36,7 @@
     parent::__construct($id);
     if ( empty($this->pilot_apikey) )
       trigger_error('Please provide a valid api key or contact api@moviepilot.de.',E_USER_WARNING);
-    $this->revision = preg_replace('|^.*?(\d+).*$|','$1','$Revision: 367 $');
+    $this->revision = preg_replace('|^.*?(\d+).*$|','$1','$Revision: 420 $');
     if (PILOT_IMDBFALLBACK) $this->imdb = new imdb($id);
     $this->setid($id);
   }
@@ -368,18 +368,38 @@
     return $this->seasoncount;
   }
 
+ #-----------------------------------------------[ Is it part of a serial? ]---
+  /** Try to figure out if this is a movie or part of a serie
+   * @method is_serial
+   * @return boolean
+   * @see IMDB page / (TitlePage)
+   */
+  public function is_serial() {
+    if ( $this->pilot_imdbfill > NO_ACCESS ) return $this->imdb->is_serial();
+  }
+
  #--------------------------------------------------------[ Plot (Outline) ]---
   /** Get the main Plot outline for the movie
    * @method plotoutline
    * @return string plotoutline
    * @see MoviePilot page / (TitlePage)
    */
-  public function plotoutline () {
+  public function plotoutline($fallback=FALSE) {
     if ($this->main_plotoutline == "") {
       if ($this->page["Title"] == "") $this->openpage ("Title");
       $this->main_plotoutline = $this->page["Title"]->{'short_description'};
+      if ( empty($this->main_plotoutline) && $fallback ) $this->main_plotoutline = $this->storyline();
     }
     return $this->main_plotoutline;
+  }
+
+  /** Get the Storyline for the movie
+   * @method storyline
+   * @return string storyline
+   * @see IMDB page / (TitlePage)
+   */
+  public function storyline () {
+    if ($this->pilot_imdbfill==FULL_ACCESS) return $this->imdb->storyline();
   }
 
  #--------------------------------------------------------[ Photo specific ]---
@@ -948,6 +968,21 @@
       $this->release_info[0] = array("country"=>$country[0],"day"=>$match[3],"month"=>$m[$match[2]],"mon"=>$match[2],"year"=>$match[1],"comment"=>"");
     }
     return $this->release_info;
+  }
+
+ #=======================================================[ /locations page ]===
+  /** Obtain filming locations
+   * @method locations
+   * @return array locations array[0..n] of array[name,url] with name being the
+   *               name of the location, and url a relative URL to list other
+   *               movies sharing this location
+   * @see IMDB page /locations
+   * @brief No data available at MoviePilot. AutoRetrieval from IMDB with
+   *        <code>pilot_imdbfill</code> set to FULL_ACCESS
+   */
+  public function locations() {
+    if ($this->pilot_imdbfill==FULL_ACCESS) return $this->imdb->locations();
+    else return array();
   }
 
  #==================================================[ /companycredits page ]===

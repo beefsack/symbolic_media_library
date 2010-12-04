@@ -9,9 +9,9 @@
  # under the terms of the GNU General Public License (see doc/LICENSE)       #
  #############################################################################
 
- /* $Id: mdb_request.class.php 384 2010-05-18 18:20:23Z izzy $ */
+ /* $Id: mdb_request.class.php 422 2010-10-16 23:56:12Z izzy $ */
 
-if ( $PEAR ) { // Use the HTTP_Request class from the PEAR project.
+if ( isset($PEAR) && $PEAR ) { // Use the HTTP_Request class from the PEAR project.
   require_once("HTTP/Request.php");
   class MDB_Request extends HTTP_Request{
     function __construct($url){
@@ -31,6 +31,7 @@ if ( $PEAR ) { // Use the HTTP_Request class from the PEAR project.
   }
 } else { // Use the browseremu class
   require_once (dirname(__FILE__)."/browseremulator.class.php");
+  require_once (dirname(__FILE__)."/mdb_config.class.php");
 
   /** The request class
    *  Here we emulate a browser accessing the IMDB site. You don't need to
@@ -43,13 +44,25 @@ if ( $PEAR ) { // Use the HTTP_Request class from the PEAR project.
     /** Constructor: Initialize the BrowserEmulator
      *  No need to call this.
      * @constructor MDB_Request
+     * @param string url URL to open
+     * @param optional string force_agent user agent string to use. Defaults to the one set in mdb_config.
+     * @param optional string trigger_referer whether to trigger the referer. 'TRUE' = yes, 'FALSE' = no, '' = take value from mdb_config (default)
      */
-    function __construct($url){
-      if ($GLOBALS['PEAR']) parent::__construct();
+    function __construct($url,$force_agent='',$trigger_referer=''){
+      if (isset($GLOBALS['PEAR']) && $GLOBALS['PEAR']) parent::__construct();
       else $this->BrowserEmulator();
       $this->urltoopen = $url;
-      if ( substr(get_class($this),0,4)=="imdb" ) $this->addHeaderLine('Referer','http://' . $this->imdbsite . '/');
-      elseif ( in_array('HTTP_REFERER',array_keys($_SERVER)) ) $this->addHeaderLine('Referer',$_SERVER['HTTP_REFERER']);
+      $iconf = new mdb_config;
+      if (!empty($force_agent)) $iconf->force_agent = $force_agent;
+      switch (strtolower($trigger_referer)) {
+        case 'true' : $iconf->trigger_referer = TRUE; break;
+        case 'false': $iconf->trigger_referer = FALSE; break;
+      }
+      if ($iconf->trigger_referer) {
+        if ( substr(get_class($this),0,4)=="imdb" ) $this->addHeaderLine('Referer','http://' . $this->imdbsite . '/');
+        elseif ( in_array('HTTP_REFERER',array_keys($_SERVER)) ) $this->addHeaderLine('Referer',$_SERVER['HTTP_REFERER']);
+      }
+      if ($iconf->force_agent) $this->addHeaderLine('User-Agent', $iconf->force_agent);
     }
     /** Send a request to the movie site
      * @method sendRequest
