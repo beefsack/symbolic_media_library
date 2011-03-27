@@ -7,10 +7,6 @@ class Model_LibraryType_Tv extends Model_LibraryType
 	
 	protected function _getData($directory)
 	{
-		if (!preg_match('/^\d+$/', $directory)) {
-			return array();
-		}
-
 		$tvdb = new Model_Parser_Tvdb(array(
 			'id' => $directory,
 		));

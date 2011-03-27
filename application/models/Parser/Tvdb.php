@@ -14,8 +14,13 @@ class Model_Parser_Tvdb extends Model_Parser
 	{
 
 		$tvdb = new \TheTVDB\Adapter();
-		$series = $tvdb->setKey('DE7F2177E690663F')
-				->getSeries($this->_options['id']);
+		$result = $tvdb->setKey('DE7F2177E690663F')
+				->findSeries($this->_options['id']);
+
+		if (!$result)
+			return false; // Nuthin for this
+
+		$series = reset($result);
 
 		$data = $series->toArray();
 

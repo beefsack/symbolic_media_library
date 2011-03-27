@@ -194,7 +194,7 @@ abstract class Model_LibraryType
 		$this->_logger->info('Parsing '.$source.'.');
 		if (is_dir($source) && !is_link($source) && ($dir = opendir($source)) !== false) {
 			$pathinfo = pathinfo($source);
-			if (!$this->_database->xpath('//item[@id="'.str_replace('"', '&quot;', $pathinfo['basename']).'"]') && $data = $this->_getData($pathinfo['basename'])) {
+			if ($source != $this->_source && !$this->_database->xpath('//item[@id="'.str_replace('"', '&quot;', $pathinfo['basename']).'"]') && $data = $this->_getData($pathinfo['basename'])) {
 				$this->_logger->info('Fetched data for '.$pathinfo['basename'].'.');
 				$data['path'] = str_replace($this->_source, '', $source);
 				$item = $this->_database->addChild('item');

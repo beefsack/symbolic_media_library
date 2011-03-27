@@ -96,13 +96,41 @@ class Adapter
 	}
 
 
+	public function findSeries($name)
+	{
+
+		$result = array();
+
+		$request = new namespace\Request();
+		$response = $request->setKey($this->getKey())
+				->findMirror('xml')
+				->setPage('/api/GetSeries.php')
+				->setParam('seriesname', $name)
+				->request()
+				->getResponse();
+
+		$data = simplexml_load_string($response);
+
+		foreach ($data->Series as $s) {
+
+			$series = new namespace\Series($this);
+			$series->load($s->seriesid);
+			$result[] = $series;
+
+		}
+
+		return $result;
+
+	}
+
+
 }
 
 
 class Request
 {
 
-	const BASE_URL = '{{{mirror}}}/api/{{{key}}}/{{{page}}}';
+	const BASE_URL = '{{{mirror}}}{{{page}}}';
 
 
 	/**
@@ -282,8 +310,10 @@ class Request
 	protected function requestMirrorList()
 	{
 
+		$key = $this->getKey();
+
 		$request = new self();
-		$response = $request->setPage('mirrors.xml')
+		$response = $request->setPage("/api/$key/mirrors.xml")
 				->setKey($this->getKey())
 				->request()
 				->getResponse();
@@ -336,7 +366,7 @@ class Request
 
 		foreach ($this->_params as $key => $value) {
 
-			$params = urlencode($key) . '=' . urlencode($value);
+			$params[] = urlencode($key) . '=' . urlencode($value);
 
 		}
 
@@ -496,10 +526,12 @@ class Series extends Data
 	public function load($id)
 	{
 
+		$key = $this->getAdapter()->getKey();
+
 		$request = new Request();
-		$this->_loadXml($request->setKey($this->getAdapter()->getKey())
+		$this->loadXml($request->setKey($this->getAdapter()->getKey())
 				->findMirror('xml')
-				->setPage("series/$id/")
+				->setPage("/api/$key/series/$id/")
 				->request()
 				->getResponse());
 
@@ -508,7 +540,7 @@ class Series extends Data
 	}
 
 
-	protected function _loadXml($xml)
+	public function loadXml($xml)
 	{
 
 		$data = simplexml_load_string($xml);
@@ -689,7 +721,8 @@ class Series extends Data
 		$request = new namespace\Request();
 		return $request->setKey($this->getAdapter()->getKey())
 				->findMirror('banner')
-				->getMirror() . "/banners/{$this['banner']}";
+				->setPage("/banners/{$this['banner']}")
+				->getUrl();
 
 	}
 
@@ -700,7 +733,8 @@ class Series extends Data
 		$request = new namespace\Request();
 		return $request->setKey($this->getAdapter()->getKey())
 				->findMirror('banner')
-				->getMirror() . "/banners/{$this['fanart']}";
+				->setPage("/banners/{$this['fanart']}")
+				->getUrl();
 
 	}
 
@@ -719,7 +753,8 @@ class Series extends Data
 		$request = new namespace\Request();
 		return $request->setKey($this->getAdapter()->getKey())
 				->findMirror('banner')
-				->getMirror() . "/banners/{$this['poster']}";
+				->setPage("/banners/{$this['poster']}")
+				->getUrl();
 
 	}
 
