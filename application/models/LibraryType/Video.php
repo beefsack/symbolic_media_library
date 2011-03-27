@@ -3,7 +3,7 @@
 class Model_LibraryType_Video extends Model_LibraryType
 {
 	protected $_name = 'Video Library';
-	protected $_pluginBase = Model_LibraryPlugin_Video;
+	protected $_pluginBase = 'Model_LibraryPlugin_Video';
 	
 	protected function _getData($directory)
 	{

@@ -3,7 +3,7 @@
 class Model_LibraryType_Anime extends Model_LibraryType
 {
 	protected $_name = 'Anime Library';
-	protected $_pluginBase = Model_LibraryPlugin_Anime;
+	protected $_pluginBase = 'Model_LibraryPlugin_Anime';
 	
 	protected function _getData($directory)
 	{

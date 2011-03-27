@@ -9,7 +9,7 @@ defined('APPLICATION_ENV')
     || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'production'));
     
 defined('PUBLIC_PATH')
-	|| define('PUBLIC_PATH', '/symbolicmedialibrary/public');
+	|| define('PUBLIC_PATH', '');
 
 // Ensure library/ is on include_path
 set_include_path(implode(PATH_SEPARATOR, array(
