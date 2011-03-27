@@ -189,7 +189,7 @@ abstract class Model_LibraryType
 	 * Recurses the source and fills the database.  Does not follow symbolic links.
 	 * @param string $source
 	 */
-	protected function _parseSource($source)
+	protected function _parseSource($source, $recurseDepth = 1)
 	{
 		$this->_logger->info('Parsing '.$source.'.');
 		if (is_dir($source) && !is_link($source) && ($dir = opendir($source)) !== false) {
@@ -202,11 +202,11 @@ abstract class Model_LibraryType
 				$this->_setData($item, $data);
 			}
 			// Parse children
-			while (($file = readdir($dir)) !== false) {
+			while ($recurseDepth != 0 && ($file = readdir($dir)) !== false) {
 				if ($file == '.' || $file == '..') {
 					continue;
 				}
-				$this->_parseSource($source.'/'.$file);
+				$this->_parseSource($source.'/'.$file, $recurseDepth - 1);
 			}
 			closedir($dir);
 		}
