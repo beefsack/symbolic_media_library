@@ -14,7 +14,7 @@ abstract class Model_LibraryPlugin_Tv extends Model_LibraryPlugin
 	
 	protected function _buildTitle(SimpleXMLElement $data)
 	{
-		return $this->_parseTitle($data->titles->main);
+		return $this->_parseTitle($data->SeriesName);
 	}
 	
 	
