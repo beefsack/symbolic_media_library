@@ -86,6 +86,11 @@ class Adapter
 	}
 
 
+	/**
+	 * Gets a series
+	 * @param integer $id
+	 * @return Series
+	 */
 	public function getSeries($id)
 	{
 
@@ -96,6 +101,11 @@ class Adapter
 	}
 
 
+	/**
+	 * Finds series by name
+	 * @param string $name
+	 * @return array
+	 */
 	public function findSeries($name)
 	{
 
@@ -127,9 +137,15 @@ class Adapter
 }
 
 
+/**
+ * The request class, which handles connections to the API
+ */
 class Request
 {
 
+	/**
+	 * The base URL format
+	 */
 	const BASE_URL = '{{{mirror}}}{{{page}}}';
 
 
@@ -205,6 +221,11 @@ class Request
     }
 
 
+	/**
+	 * Sets the page that will be requested
+	 * @param string $page
+	 * @return Request
+	 */
 	public function setPage($page)
 	{
 
@@ -215,6 +236,10 @@ class Request
 	}
 
 
+	/**
+	 * Gets the page that will be requested
+	 * @return string
+	 */
 	public function getPage()
 	{
 
@@ -223,6 +248,12 @@ class Request
 	}
 
 
+	/**
+	 * Sets a request parameter
+	 * @param string $name
+	 * @param string $value
+	 * @return Request
+	 */
 	public function setParam($name, $value)
 	{
 
@@ -233,6 +264,11 @@ class Request
 	}
 
 
+	/**
+	 * Gets a request parameter
+	 * @param string $name
+	 * @return string
+	 */
 	public function getParam($name)
 	{
 
@@ -241,6 +277,11 @@ class Request
 	}
 
 
+	/**
+	 * Sets the request parameters
+	 * @param array $params
+	 * @return Request
+	 */
 	public function setParams(array $params)
 	{
 
@@ -251,6 +292,10 @@ class Request
 	}
 
 
+	/**
+	 * Gets the request parameters
+	 * @return array
+	 */
 	public function getParams()
 	{
 
@@ -259,6 +304,11 @@ class Request
 	}
 
 
+	/**
+	 * Sets the mirror to request
+	 * @param string $mirror
+	 * @return Request
+	 */
 	public function setMirror($mirror)
 	{
 
@@ -269,6 +319,10 @@ class Request
 	}
 
 
+	/**
+	 * Gets the mirror that will be requested
+	 * @return string
+	 */
 	public function getMirror()
 	{
 
@@ -277,6 +331,11 @@ class Request
 	}
 
 
+	/**
+	 * Finds a mirror of the required type
+	 * @param string $type Possible values are xml|banner|zip
+	 * @return string
+	 */
 	public function findMirror($type)
 	{
 
@@ -285,6 +344,10 @@ class Request
 	}
 
 
+	/**
+	 * Gets an array of mirrors, keyed as types xml|banner|zip
+	 * @return array
+	 */
 	public function getMirrors()
 	{
 
@@ -297,6 +360,11 @@ class Request
 	}
 
 
+	/**
+	 * Gets a random mirror of a type
+	 * @param string $type Possible values are xml|banner|zip
+	 * @return string
+	 */
 	public function getRandomMirror($type)
 	{
 
@@ -307,6 +375,10 @@ class Request
 	}
 
 
+	/**
+	 * Requests the mirror list
+	 * @return string
+	 */
 	protected function requestMirrorList()
 	{
 
@@ -323,6 +395,11 @@ class Request
 	}
 
 
+	/**
+	 * Parses mirror list XML into an object
+	 * @param string $xml
+	 * @return SimpleXMLElement
+	 */
 	protected function parseMirrorListXml($xml)
 	{
 
@@ -375,6 +452,10 @@ class Request
 	}
 
 
+	/**
+	 * Performs the request
+	 * @return Request
+	 */
 	public function request()
 	{
 
@@ -388,6 +469,10 @@ class Request
 	}
 
 
+	/**
+	 * Gets the response of the last request
+	 * @return string
+	 */
 	public function getResponse()
 	{
 
@@ -396,6 +481,10 @@ class Request
 	}
 
 
+	/**
+	 * Gets the url for the request
+	 * @return string
+	 */
 	public function getUrl()
 	{
 
@@ -417,9 +506,18 @@ class Request
 }
 
 
+/**
+ * The data class is the base class for the models.
+ * It allows array access directly to the data, and enforces passing an adapter
+ * on creation.
+ */
 class Data implements \ArrayAccess
 {
 
+	/**
+	 * The actual data that the data model is modeling
+	 * @var array
+	 */
 	protected $_data = array();
 
 
@@ -465,6 +563,10 @@ class Data implements \ArrayAccess
 	}
 
 
+	/**
+	 * Returns the data as a raw array.
+	 * @return array
+	 */
 	public function toArray()
 	{
 
@@ -505,6 +607,11 @@ class Data implements \ArrayAccess
 	}
 
 
+	/**
+	 * Explodes a bar delimited string to an array
+	 * @param string $string
+	 * @return array
+	 */
 	protected function _explodeBarDelimitedString($string)
 	{
 
@@ -520,9 +627,17 @@ class Data implements \ArrayAccess
 }
 
 
+/**
+ * Model for a series in the database
+ */
 class Series extends Data
 {
 
+	/**
+	 * Loads a series of the specified id
+	 * @param integer $id
+	 * @return Series
+	 */
 	public function load($id)
 	{
 
@@ -540,6 +655,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Loads data from an xml string
+	 * @param string $xml
+	 */
 	public function loadXml($xml)
 	{
 
@@ -556,6 +675,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the id for the series
+	 * @return integer
+	 */
 	public function getId()
 	{
 
@@ -564,6 +687,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the actors for the series
+	 * @return array
+	 */
 	public function getActors()
 	{
 
@@ -572,6 +699,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the day of the week the series airs
+	 * @return string
+	 */
 	public function getAirsDayOfWeek()
 	{
 
@@ -580,6 +711,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the time the series airs
+	 * @return string
+	 */
 	public function getAirsTime()
 	{
 
@@ -588,6 +723,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the content rating for the series
+	 * @return string
+	 */
 	public function getContentRating()
 	{
 
@@ -596,6 +735,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the date the series first aired
+	 * @return string
+	 */
 	public function getFirstAired()
 	{
 
@@ -604,6 +747,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the genres of the series
+	 * @return array
+	 */
 	public function getGenres()
 	{
 
@@ -611,6 +758,11 @@ class Series extends Data
 
 	}
 
+
+	/**
+	 * Gets the IMDB id of the series
+	 * @return string
+	 */
 	public function getImdbId()
 	{
 
@@ -619,6 +771,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the language of the series
+	 * @return string
+	 */
 	public function getLanguage()
 	{
 
@@ -627,6 +783,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the network who run the series
+	 * @return string
+	 */
 	public function getNetwork()
 	{
 
@@ -635,6 +795,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the network id of the network who runs the series
+	 * @return string
+	 */
 	public function getNetworkId()
 	{
 
@@ -643,6 +807,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets an overview of the series
+	 * @return string
+	 */
 	public function getOverview()
 	{
 
@@ -651,6 +819,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the rating for the series
+	 * @return float
+	 */
 	public function getRating()
 	{
 
@@ -659,6 +831,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the number of ratings for the series
+	 * @return integer
+	 */
 	public function getRatingCount()
 	{
 
@@ -667,6 +843,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the runtime of the series
+	 * @return integer
+	 */
 	public function getRuntime()
 	{
 
@@ -675,6 +855,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the series id
+	 * @return integer
+	 */
 	public function getSeriesId()
 	{
 
@@ -683,6 +867,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the name of the series
+	 * @return string
+	 */
 	public function getSeriesName()
 	{
 
@@ -691,6 +879,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the status of the series
+	 * @return string
+	 */
 	public function getStatus()
 	{
 
@@ -699,6 +891,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets when the series was added
+	 * @return string
+	 */
 	public function getAdded()
 	{
 
@@ -707,6 +903,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the person who added the series
+	 * @return string
+	 */
 	public function getAddedBy()
 	{
 
@@ -715,6 +915,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the url for a banner for the series
+	 * @return string
+	 */
 	public function getBanner()
 	{
 
@@ -727,6 +931,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the url for some fanart for the series
+	 * @return string
+	 */
 	public function getFanart()
 	{
 
@@ -739,6 +947,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets when the series was last updated
+	 * @return integer
+	 */
 	public function getLastUpdated()
 	{
 
@@ -747,6 +959,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the url for a poster for the series
+	 * @return string
+	 */
 	public function getPoster()
 	{
 
@@ -759,6 +975,10 @@ class Series extends Data
 	}
 
 
+	/**
+	 * Gets the Zap2it id for the series
+	 * @return string
+	 */
 	public function getZap2itId()
 	{
 
